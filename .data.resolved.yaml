@@ -1,0 +1,18 @@
+# AUTO-GENERATED from data.yaml - do not edit, do not commit.
+# Ultralytics resolves a relative `path:` against its global datasets_dir,
+# not against data.yaml, so this copy pins an absolute path.
+# Regenerated automatically on every train/evaluate run.
+path: K:/University Study/University/Thesis Al folder/Thesis 4/dataset
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: person
+  1: pole
+  2: tree
+  3: stairs
+  4: pothole
+  5: open_drain
+  6: parked_vehicle
+  7: street_obstacle
+  8: curb

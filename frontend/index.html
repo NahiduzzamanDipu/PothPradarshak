@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Navigation assistance for visually impaired individuals using real-time object detection with Bengali and English voice guidance.">
+
+<title>PothPradasshak</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<!-- Screen-reader announcements. Guidance is mirrored here so assistive
+     technology speaks it even when audio output is muted. -->
+<div class="sr-only" role="status" aria-live="assertive" aria-atomic="true" id="srGuidance"></div>
+<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" id="srStatus"></div>
+
+<a class="skip-link" href="#guidance">Skip to guidance</a>
+
+
+<!-- ============================ HEADER ============================ -->
+<header class="app-header">
+  <div class="header-inner">
+
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 L12 21 M12 3 L6 10 M12 3 L18 10"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">PothPradasshak</span>
+        <span class="brand-sub" data-i18n="tagline">Ready to help you navigate</span>
+      </span>
+    </div>
+
+    <button class="icon-btn" id="settingsBtn" type="button"
+            aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+
+  </div>
+</header>
+
+
+<!-- Notices. Hidden unless the backend actually reports something. -->
+<div class="notice notice-error" id="errorNotice" hidden role="alert">
+  <span class="notice-icon" aria-hidden="true">!</span>
+  <div class="notice-body">
+    <strong id="errorTitle">Something went wrong</strong>
+    <span id="errorText"></span>
+  </div>
+  <button class="notice-action" type="button" id="retryBtn" data-i18n="retry">Retry</button>
+</div>
+
+<div class="notice notice-warn" id="modelNotice" hidden>
+  <span class="notice-icon" aria-hidden="true">i</span>
+  <div class="notice-body"><span id="modelText"></span></div>
+</div>
+
+
+<!-- ============================= MAIN ============================= -->
+<main class="layout">
+
+  <!-- ---------------------- LEFT / PRIMARY ---------------------- -->
+  <div class="col-primary">
+
+    <!-- Input mode -->
+    <div class="segmented" role="tablist" aria-label="Input source">
+      <button class="seg-btn is-active" id="modeLive" type="button" role="tab"
+              aria-selected="true" data-mode="live">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+        <span data-i18n="modeLive">Camera</span>
+      </button>
+      <button class="seg-btn" id="modeImage" type="button" role="tab"
+              aria-selected="false" data-mode="image">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+          <path d="M21 15l-5-5L5 21"/>
+        </svg>
+        <span data-i18n="modeImage">Image</span>
+      </button>
+      <button class="seg-btn" id="modeVideo" type="button" role="tab"
+              aria-selected="false" data-mode="video">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span data-i18n="modeVideo">Video</span>
+      </button>
+    </div>
+
+
+    <!-- Detection viewport -->
+    <section class="card viewport-card" aria-label="Detection view">
+
+      <div class="viewport" id="viewport">
+
+        <img id="videoFeed" alt="Live camera view with detected objects outlined" hidden>
+        <img id="stillImage" alt="Analysed image with detected objects outlined" hidden>
+
+        <!-- This device's own camera. The <img> above is the SERVER's camera
+             streamed as MJPEG; this <video> is the phone's camera via
+             getUserMedia, with boxes drawn on the canvas over it. -->
+        <video id="localVideo" playsinline muted autoplay hidden></video>
+        <canvas id="overlay" hidden></canvas>
+
+        <!-- Empty / loading states -->
+        <div class="vp-state" id="vpEmpty">
+          <span class="vp-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+            </svg>
+          </span>
+          <p class="vp-title" id="vpTitle" data-i18n="cameraOff">Camera is off</p>
+          <p class="vp-hint" id="vpHint" data-i18n="cameraOffHint">Press Start to begin detection</p>
+        </div>
+
+        <div class="vp-state vp-loading" id="vpLoading" hidden>
+          <span class="spinner" aria-hidden="true"></span>
+          <p class="vp-title" id="loadingText" data-i18n="starting">Starting camera…</p>
+        </div>
+
+        <!-- Zone guides. Decorative: the same information is given as text. -->
+        <div class="zones" id="zones" aria-hidden="true" hidden>
+          <span class="zone-line zone-l"></span>
+          <span class="zone-line zone-r"></span>
+          <span class="zone-tag zone-tag-l" data-i18n="left">Left</span>
+          <span class="zone-tag zone-tag-c" data-i18n="ahead">Ahead</span>
+          <span class="zone-tag zone-tag-r" data-i18n="right">Right</span>
+        </div>
+
+        <span class="live-chip" id="liveChip" hidden>
+          <span class="live-dot" aria-hidden="true"></span><span data-i18n="live">LIVE</span>
+        </span>
+      </div>
+
+      <!-- Live metrics -->
+      <div class="metrics" id="metrics">
+        <div class="metric"><span class="m-key" data-i18n="objects">Objects</span><span class="m-val" id="mObjects">0</span></div>
+        <div class="metric"><span class="m-key">FPS</span><span class="m-val" id="mFps">—</span></div>
+        <div class="metric"><span class="m-key" data-i18n="speed">Speed</span><span class="m-val" id="mInference">—</span></div>
+        <div class="metric"><span class="m-key" data-i18n="model">Model</span><span class="m-val" id="mModel">—</span></div>
+      </div>
+
+      <!-- Video playback -->
+      <div class="playback" id="playback" hidden>
+        <div class="pb-row">
+          <span class="pb-time" id="pbNow">0:00</span>
+          <div class="pb-track" role="progressbar" aria-label="Video progress"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="pbTrack">
+            <span class="pb-fill" id="pbFill"></span>
+          </div>
+          <span class="pb-time" id="pbTotal">0:00</span>
+        </div>
+        <div class="pb-actions">
+          <button class="btn btn-quiet" id="pbPlay" type="button" data-i18n="play">Play</button>
+          <button class="btn btn-quiet" id="pbPause" type="button" data-i18n="pause">Pause</button>
+          <button class="btn btn-quiet" id="pbRestart" type="button" data-i18n="restart">Restart</button>
+          <span class="pb-state" id="pbState"></span>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- Which camera to use. Defaults to this device on a phone, because the
+         server camera is the laptop's webcam and is useless from a phone. -->
+    <div class="source-row" id="sourceRow">
+      <div class="segmented segmented--sm" role="tablist" aria-label="Camera source">
+        <button class="seg-btn is-active" id="srcDevice" type="button" role="tab"
+                aria-selected="true" data-src="device">
+          <span data-i18n="srcDevice">This device</span>
+        </button>
+        <button class="seg-btn" id="srcServer" type="button" role="tab"
+                aria-selected="false" data-src="server">
+          <span data-i18n="srcServer">Server camera</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Camera controls -->
+    <div class="actions" id="cameraActions">
+      <button class="btn btn-primary btn-lg" id="startBtn" type="button" data-i18n="start">Start Camera</button>
+      <button class="btn btn-outline btn-lg" id="stopBtn" type="button" data-i18n="stop">Stop</button>
+      <button class="btn btn-outline btn-lg" id="switchBtn" type="button"
+              data-i18n="switchCam" hidden>Switch Camera</button>
+      <button class="btn btn-danger btn-lg" id="stopAllBtn" type="button" data-i18n="stopAll">Stop All</button>
+    </div>
+
+    <!-- Image upload -->
+    <section class="card upload-card" id="imagePanel" hidden aria-label="Image upload">
+      <input type="file" id="imageInput" accept="image/*" class="sr-only">
+      <div class="dropzone" id="imageDrop" tabindex="0" role="button"
+           aria-label="Select an image to analyse">
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </span>
+        <p class="drop-title" data-i18n="selectImage">Select an image</p>
+        <p class="drop-hint" data-i18n="dropHint">or drop a file here</p>
+      </div>
+      <p class="file-chip" id="imageName" hidden></p>
+      <div class="actions">
+        <button class="btn btn-primary btn-lg" id="analyseBtn" type="button" disabled data-i18n="analyse">Analyse</button>
+        <button class="btn btn-outline btn-lg" id="clearBtn" type="button" data-i18n="clear">Clear</button>
+      </div>
+    </section>
+
+    <!-- Video upload -->
+    <section class="card upload-card" id="videoPanel" hidden aria-label="Video upload">
+      <input type="file" id="videoInput" accept="video/*" class="sr-only">
+      <div class="dropzone" id="videoDrop" tabindex="0" role="button"
+           aria-label="Select a recorded video to analyse">
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor"
+               stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </span>
+        <p class="drop-title" data-i18n="selectVideo">Select a recorded video</p>
+        <p class="drop-hint" data-i18n="dropHint">or drop a file here</p>
+      </div>
+      <p class="file-chip" id="videoName" hidden></p>
+      <div class="actions">
+        <button class="btn btn-primary btn-lg" id="loadVideoBtn" type="button" disabled data-i18n="loadVideo">Load Video</button>
+        <label class="switch-inline">
+          <input type="checkbox" id="loopChk">
+          <span data-i18n="loop">Repeat</span>
+        </label>
+      </div>
+    </section>
+
+  </div>
+
+
+  <!-- --------------------- RIGHT / GUIDANCE --------------------- -->
+  <div class="col-guide">
+
+    <!-- Safety status -->
+    <section class="status" id="safetyStatus" data-level="clear" aria-label="Safety status">
+      <span class="status-icon" id="statusIcon" aria-hidden="true">✓</span>
+      <span class="status-text" id="statusText" data-i18n="safeClear">Path appears clear</span>
+    </section>
+
+    <!-- Guidance -->
+    <section class="card guide-card" id="guidance" aria-label="Current guidance">
+      <h2 class="card-label" data-i18n="guidanceLabel">Current guidance</h2>
+
+      <div class="guide-main">
+        <span class="arrow" id="guideArrow" aria-hidden="true">↑</span>
+        <div class="guide-copy">
+          <p class="guide-en" id="guideEn" data-i18n="pathClear">Path is clear</p>
+          <p class="guide-bn bn" id="guideBn">সামনের পথ পরিষ্কার</p>
+        </div>
+      </div>
+
+      <div class="direction-row" aria-hidden="true">
+        <span class="dir" id="dirLeft"><b>←</b><i data-i18n="left">Left</i></span>
+        <span class="dir" id="dirAhead"><b>↑</b><i data-i18n="ahead">Ahead</i></span>
+        <span class="dir" id="dirRight"><b>→</b><i data-i18n="right">Right</i></span>
+      </div>
+    </section>
+
+    <!-- Voice -->
+    <section class="card voice-card" aria-label="Voice guidance">
+      <div class="voice-head">
+        <h2 class="card-label" data-i18n="voiceLabel">Voice guidance</h2>
+        <button class="pill" id="voiceToggle" type="button" role="switch" aria-checked="true">
+          <span class="pill-dot" aria-hidden="true"></span>
+          <span id="voiceState" data-i18n="on">On</span>
+        </button>
+      </div>
+      <div class="lang-row" role="group" aria-label="Language">
+        <button class="lang-btn is-active" id="langBn" type="button" aria-pressed="true">
+          <span class="bn">বাংলা</span>
+        </button>
+        <button class="lang-btn" id="langEn" type="button" aria-pressed="false">English</button>
+      </div>
+    </section>
+
+    <!-- Detected objects -->
+    <section class="card" aria-label="Detected objects">
+      <div class="card-head">
+        <h2 class="card-label" data-i18n="detectedLabel">Detected</h2>
+        <span class="count-chip" id="detCount">0</span>
+      </div>
+      <ul class="obj-list" id="objectList">
+        <li class="obj-empty" id="objEmpty" data-i18n="noObjects">Nothing detected yet</li>
+      </ul>
+    </section>
+
+  </div>
+</main>
+
+
+<!-- =========================== SETTINGS =========================== -->
+<div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+
+<aside class="sheet" id="settingsPanel" hidden role="dialog" aria-modal="true"
+       aria-labelledby="settingsTitle">
+  <div class="sheet-head">
+    <h2 id="settingsTitle" data-i18n="settings">Settings</h2>
+    <button class="icon-btn" id="closeSettings" type="button" aria-label="Close settings">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="sheet-body">
+
+    <div class="setting">
+      <span class="set-label" id="lblDetection" data-i18n="detection">Object detection</span>
+      <button class="pill" id="detectionToggle" type="button" role="switch"
+              aria-checked="true" aria-labelledby="lblDetection">
+        <span class="pill-dot" aria-hidden="true"></span><span id="detState" data-i18n="on">On</span>
+      </button>
+    </div>
+
+    <div class="setting">
+      <span class="set-label" id="lblIndoor" data-i18n="indoor">Indoor objects</span>
+      <button class="pill" id="indoorToggle" type="button" role="switch"
+              aria-checked="true" aria-labelledby="lblIndoor">
+        <span class="pill-dot" aria-hidden="true"></span><span id="indoorState" data-i18n="on">On</span>
+      </button>
+    </div>
+
+    <div class="setting setting-block">
+      <label class="set-label" for="confidence" data-i18n="confidence">Confidence threshold</label>
+      <p class="set-hint" data-i18n="confidenceHint">Lower detects more objects but with more mistakes.</p>
+      <div class="slider-row">
+        <input type="range" id="confidence" min="10" max="95" step="5" value="30">
+        <output class="slider-out" id="confValue" for="confidence">30%</output>
+      </div>
+    </div>
+
+    <div class="setting setting-block">
+      <label class="set-label" for="cooldown" data-i18n="cooldown">Repeat delay</label>
+      <p class="set-hint" data-i18n="cooldownHint">How long before the same object is announced again.</p>
+      <div class="slider-row">
+        <input type="range" id="cooldown" min="1" max="10" step="0.5" value="3">
+        <output class="slider-out" id="cooldownValue" for="cooldown">3.0s</output>
+      </div>
+    </div>
+
+    <div class="setting">
+      <span class="set-label" id="lblFar" data-i18n="announceFar">Announce distant objects</span>
+      <button class="pill is-off" id="farToggle" type="button" role="switch"
+              aria-checked="false" aria-labelledby="lblFar">
+        <span class="pill-dot" aria-hidden="true"></span><span id="farState" data-i18n="off">Off</span>
+      </button>
+    </div>
+
+    <div class="sheet-note">
+      <p data-i18n="proximityNote">Distances are estimated from how large an object appears.
+      They are approximate and are not measured.</p>
+    </div>
+
+    <div class="sheet-meta" id="sheetMeta"></div>
+
+  </div>
+</aside>
+
+
+<footer class="app-footer">
+  <p data-i18n="disclaimer">Research prototype. Do not rely on this as your only navigation aid.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

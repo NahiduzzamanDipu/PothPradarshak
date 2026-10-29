@@ -1,0 +1,679 @@
+/* ==========================================================================
+   Navigation Assist — stylesheet
+   --------------------------------------------------------------------------
+   Light, calm, mobile-first. Written for an assistive tool rather than a
+   dashboard: the reading order on a phone is safety status, guidance, then
+   detail, and nothing decorative competes with those.
+
+   Two rules run through the whole file:
+     1. No state is signalled by colour alone. Every colour cue is paired
+        with an icon and a word, because a user with low vision or colour
+        blindness must get the same information.
+     2. Interactive targets are at least 44px, and focus is always visible.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* --- surfaces --- */
+  --bg:            #f6f8fb;
+  --surface:       #ffffff;
+  --surface-sunk:  #f2f5f9;
+  --border:        #e3e8ef;
+  --border-strong: #cbd5e1;
+
+  /* --- text --- */
+  --text:      #0f172a;
+  --text-soft: #475569;
+  --text-faint:#5c6a7d;   /* darkened: #7c8aa0 measured 3.29:1, below AA 4.5 */
+
+  /* --- one accent, used sparingly --- */
+  --primary:      #1d4ed8;
+  --primary-dark: #1739a8;
+  --primary-soft: #eaf0ff;
+
+  /* --- states --- */
+  --ok:       #15803d;  --ok-soft:   #e9f7ee;  --ok-line:   #b7e3c6;
+  --warn:     #b45309;  --warn-soft: #fdf3e3;  --warn-line: #f0d5a8;
+  --danger:   #b91c1c;  --danger-soft:#fdeceb; --danger-line:#f3c4c1;
+
+  --radius:    14px;
+  --radius-sm: 10px;
+  --shadow:    0 1px 2px rgba(15, 23, 42, .05);
+  --shadow-md: 0 3px 12px rgba(15, 23, 42, .07);
+
+  --tap: 44px;               /* minimum touch target */
+  --pad: 16px;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: Inter, "Noto Sans Bengali", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Bengali needs a little more leading than Latin at the same size. */
+.bn { font-family: "Noto Sans Bengali", Inter, sans-serif; line-height: 1.75; }
+
+h1, h2, h3, p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+ul { list-style: none; margin: 0; padding: 0; }
+
+[hidden] { display: none !important; }
+
+/* Visible focus everywhere. An assistive product that cannot be driven from
+   a keyboard would be self-defeating. */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; left: 12px; top: -60px; z-index: 200;
+  background: var(--surface); color: var(--primary);
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  border: 2px solid var(--primary); font-weight: 600; text-decoration: none;
+  transition: top .15s;
+}
+.skip-link:focus { top: 12px; }
+
+/* ============================== HEADER ============================== */
+
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+  padding-top: env(safe-area-inset-top);
+}
+
+.header-inner {
+  max-width: 1180px; margin: 0 auto;
+  padding: 10px var(--pad);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+
+.brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+
+.brand-mark {
+  width: 38px; height: 38px; flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--primary); color: #fff;
+  display: grid; place-items: center;
+}
+
+.brand-text { display: flex; flex-direction: column; min-width: 0; }
+.brand-name { font-size: 16px; font-weight: 700; letter-spacing: -.2px; }
+.brand-sub  { font-size: 12.5px; color: var(--text-soft);
+              white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.icon-btn {
+  width: var(--tap); height: var(--tap); flex-shrink: 0;
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: var(--radius-sm); color: var(--text-soft);
+  display: grid; place-items: center; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.icon-btn:hover { background: var(--surface-sunk); color: var(--text); }
+.icon-btn:active { transform: scale(.97); }
+
+/* ============================== NOTICES ============================== */
+
+.notice {
+  max-width: 1180px; margin: 12px auto 0;
+  padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 11px;
+  border-radius: var(--radius); font-size: 14px;
+  border: 1px solid;
+}
+.notice-error { background: var(--danger-soft); border-color: var(--danger-line); color: #7f1d1d; }
+.notice-warn  { background: var(--warn-soft);   border-color: var(--warn-line);   color: #78350f; }
+
+.notice-icon {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 700; font-size: 13px;
+  background: rgba(255,255,255,.75);
+}
+.notice-body { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.notice-body strong { font-size: 14px; }
+.notice-action {
+  flex-shrink: 0; min-height: 36px; padding: 0 14px;
+  border: 1px solid currentColor; background: transparent;
+  border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* ============================== LAYOUT ============================== */
+/* Mobile-first: one column. The guidance column is ordered FIRST on small
+   screens, because on a phone the safety state must be the first thing
+   reachable, not something below a large video. */
+
+.layout {
+  max-width: 1180px; margin: 0 auto;
+  padding: var(--pad);
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+.col-primary, .col-guide { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* Mobile reading order follows the intended layout: choose a source, see what
+   the camera sees, then the safety state and the instruction. The status sits
+   directly beneath the viewport so the two are read as one unit. */
+
+/* ============================== CARDS ============================== */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  box-shadow: var(--shadow);
+}
+
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+.card-label {
+  font-size: 12px; font-weight: 600; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--text-faint);
+  margin-bottom: 10px;
+}
+.card-head .card-label { margin-bottom: 0; }
+
+.count-chip {
+  min-width: 26px; height: 24px; padding: 0 8px;
+  border-radius: 12px; background: var(--surface-sunk);
+  color: var(--text-soft); font-size: 13px; font-weight: 600;
+  display: grid; place-items: center;
+}
+
+/* ========================= SEGMENTED CONTROL ========================= */
+
+.segmented {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+  background: var(--surface-sunk);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 4px;
+}
+
+.seg-btn {
+  min-height: var(--tap);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  border: none; background: transparent; cursor: pointer;
+  border-radius: 9px; font-size: 14px; font-weight: 600;
+  color: var(--text-soft);
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn.is-active {
+  background: var(--surface); color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.seg-btn svg { flex-shrink: 0; }
+
+/* ============================= VIEWPORT ============================= */
+
+.viewport-card { padding: 10px; }
+
+.viewport {
+  position: relative;
+  width: 100%; aspect-ratio: 4 / 3;
+  background: var(--surface-sunk);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: grid; place-items: center;
+}
+@media (min-width: 700px) { .viewport { aspect-ratio: 16 / 10; } }
+
+#videoFeed, #stillImage {
+  width: 100%; height: 100%; object-fit: contain; display: block;
+  background: #0b1220;      /* letterbox bars read as camera, not as page */
+}
+
+.vp-state {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; text-align: center; padding: 20px; color: var(--text-soft);
+}
+.vp-icon { color: var(--text-faint); }
+.vp-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.vp-hint  { font-size: 13.5px; color: var(--text-soft); }
+.vp-loading { background: rgba(246, 248, 251, .94); }
+
+.spinner {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 3px solid var(--border-strong); border-top-color: var(--primary);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Zone guides. Faint on purpose — they orient, they do not decorate. */
+.zones { position: absolute; inset: 0; pointer-events: none; }
+.zone-line { position: absolute; top: 0; bottom: 0; width: 1px;
+             background: rgba(255,255,255,.42); }
+.zone-l { left: 33.33%; } .zone-r { left: 66.66%; }
+.zone-tag {
+  position: absolute; bottom: 8px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .4px;
+  color: #fff; background: rgba(15,23,42,.55);
+  padding: 2px 7px; border-radius: 5px; transform: translateX(-50%);
+}
+.zone-tag-l { left: 16.6%; } .zone-tag-c { left: 50%; } .zone-tag-r { left: 83.3%; }
+
+.live-chip {
+  position: absolute; top: 9px; left: 9px;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(15,23,42,.72); color: #fff;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  padding: 4px 9px; border-radius: 20px;
+}
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #f87171;
+            animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* ============================== METRICS ============================== */
+
+.metrics {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  margin-top: 10px;
+}
+.metric {
+  background: var(--surface-sunk); border-radius: 9px;
+  padding: 8px 6px; text-align: center; min-width: 0;
+}
+.m-key { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .3px;
+         text-transform: uppercase; color: var(--text-faint); }
+.m-val { display: block; font-size: 15px; font-weight: 700; margin-top: 2px;
+         font-variant-numeric: tabular-nums;
+         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ============================= PLAYBACK ============================= */
+
+.playback {
+  margin-top: 10px; padding: 11px;
+  background: var(--surface-sunk); border-radius: var(--radius-sm);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.pb-row { display: flex; align-items: center; gap: 10px; }
+.pb-time { font-size: 12.5px; font-variant-numeric: tabular-nums;
+           color: var(--text-soft); min-width: 38px; flex-shrink: 0; }
+.pb-track { flex: 1; height: 8px; border-radius: 5px;
+            background: var(--border); overflow: hidden; }
+.pb-fill  { display: block; height: 100%; width: 0;
+            background: var(--primary); border-radius: 5px;
+            transition: width .25s linear; }
+.pb-actions { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.pb-state { margin-left: auto; font-size: 12.5px; font-weight: 600;
+            color: var(--text-soft); }
+
+/* ============================== BUTTONS ============================== */
+
+.actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.actions .btn { flex: 1 1 auto; }
+
+.btn {
+  min-height: var(--tap); padding: 0 18px;
+  border-radius: var(--radius-sm); border: 1px solid transparent;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  transition: background .15s, border-color .15s, color .15s, transform .08s;
+}
+.btn:active:not(:disabled) { transform: scale(.985); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.btn-lg { min-height: 50px; font-size: 15.5px; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+
+.btn-outline { background: var(--surface); border-color: var(--border-strong); color: var(--text); }
+.btn-outline:hover:not(:disabled) { background: var(--surface-sunk); }
+
+.btn-danger { background: var(--surface); border-color: var(--danger-line); color: var(--danger); }
+.btn-danger:hover:not(:disabled) { background: var(--danger-soft); }
+
+.btn-quiet {
+  min-height: var(--tap); padding: 0 14px; font-size: 13.5px;
+  background: var(--surface); border-color: var(--border-strong); color: var(--text);
+}
+.btn-quiet:hover:not(:disabled) { background: var(--surface-sunk); }
+
+/* ============================== UPLOAD ============================== */
+
+.upload-card { display: flex; flex-direction: column; gap: 12px; }
+
+.dropzone {
+  border: 2px dashed var(--border-strong); border-radius: var(--radius);
+  background: var(--surface-sunk);
+  padding: 26px 18px; text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: border-color .15s, background .15s;
+}
+.dropzone:hover, .dropzone.is-over { border-color: var(--primary); background: var(--primary-soft); }
+.drop-icon { color: var(--primary); }
+.drop-title { font-size: 15px; font-weight: 600; }
+.drop-hint  { font-size: 13px; color: var(--text-soft); }
+
+.file-chip {
+  font-size: 13px; color: var(--text-soft);
+  background: var(--surface-sunk); border-radius: 8px;
+  padding: 8px 11px; word-break: break-all;
+}
+
+.switch-inline {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: var(--tap); padding: 0 12px; font-size: 14px;
+  color: var(--text-soft); cursor: pointer;
+}
+.switch-inline input { width: 24px; height: 24px; accent-color: var(--primary); cursor: pointer; }
+
+/* ========================== SAFETY STATUS ========================== */
+/* Level is carried by icon + word + border weight, never colour alone. */
+
+.status {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid; border-left-width: 5px;
+  font-weight: 600;
+}
+.status-icon {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%;
+  display: grid; place-items: center; font-size: 16px; font-weight: 700;
+  background: rgba(255,255,255,.75);
+}
+.status-text { font-size: 15.5px; line-height: 1.35; }
+
+.status[data-level="clear"]     { background: var(--ok-soft);     border-color: var(--ok-line);     color: #14532d; }
+.status[data-level="attention"] { background: var(--surface);     border-color: var(--border-strong); color: var(--text); }
+.status[data-level="warning"]   { background: var(--warn-soft);   border-color: var(--warn-line);   color: #78350f; }
+.status[data-level="critical"]  { background: var(--danger-soft); border-color: var(--danger-line); color: #7f1d1d; }
+.status[data-level="critical"] .status-text { font-size: 17px; }
+
+/* ============================= GUIDANCE ============================= */
+
+.guide-card { border-color: var(--border-strong); }
+
+.guide-main { display: flex; align-items: center; gap: 14px; }
+
+.arrow {
+  width: 62px; height: 62px; flex-shrink: 0;
+  border-radius: var(--radius); background: var(--primary-soft);
+  color: var(--primary);
+  display: grid; place-items: center;
+  font-size: 34px; font-weight: 700; line-height: 1;
+  transition: background .2s, color .2s;
+}
+.guide-card.is-urgent .arrow { background: var(--danger-soft); color: var(--danger); }
+
+.guide-copy { min-width: 0; }
+.guide-en { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.guide-bn { font-size: 17px; color: var(--text-soft); margin-top: 3px; }
+
+/* When Bengali is the active language it leads, so it gets the larger size. */
+.lang-bn .guide-en { font-size: 15.5px; font-weight: 500; color: var(--text-soft); order: 2; }
+.lang-bn .guide-bn { font-size: 21px; font-weight: 700; color: var(--text); order: 1; margin-top: 0; }
+.lang-bn .guide-copy { display: flex; flex-direction: column; }
+.lang-bn .guide-en { margin-top: 3px; }
+
+.direction-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  margin-top: 13px; padding-top: 13px; border-top: 1px solid var(--border);
+}
+.dir {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 4px; border-radius: 9px;
+  background: var(--surface-sunk); color: var(--text-faint);
+  transition: background .18s, color .18s;
+}
+.dir b { font-size: 19px; line-height: 1; }
+.dir i { font-style: normal; font-size: 11px; font-weight: 600;
+         letter-spacing: .3px; text-transform: uppercase; }
+.dir.is-on { background: var(--primary); color: #fff; }
+.dir.is-alert { background: var(--danger); color: #fff; }
+
+/* =============================== VOICE =============================== */
+
+.voice-card { display: flex; flex-direction: column; gap: 12px; }
+.voice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+.pill {
+  min-height: var(--tap); padding: 0 16px 0 12px;
+  display: inline-flex; align-items: center; gap: 8px;
+  border-radius: 20px; border: 1px solid var(--ok-line);
+  background: var(--ok-soft); color: #14532d;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.pill-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); }
+.pill.is-off { background: var(--surface-sunk); border-color: var(--border-strong); color: var(--text-soft); }
+.pill.is-off .pill-dot { background: var(--text-faint); }
+
+.lang-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lang-btn {
+  min-height: var(--tap);
+  border: 1px solid var(--border-strong); background: var(--surface);
+  border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+  color: var(--text-soft); cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.lang-btn:hover { background: var(--surface-sunk); }
+.lang-btn.is-active {
+  background: var(--primary); border-color: var(--primary); color: #fff;
+}
+
+/* =========================== OBJECT LIST =========================== */
+
+.obj-list { display: flex; flex-direction: column; gap: 7px; margin-top: 11px; }
+
+.obj-empty {
+  font-size: 14px; color: var(--text-faint);
+  padding: 14px 2px; text-align: center;
+}
+
+.obj {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border-radius: var(--radius-sm);
+  background: var(--surface-sunk); border: 1px solid transparent;
+}
+/* A hazard gets a left rule and a marker, not just a tint. */
+.obj.is-hazard { background: var(--danger-soft); border-color: var(--danger-line); }
+
+.obj-dir {
+  width: 34px; height: 34px; flex-shrink: 0; border-radius: 9px;
+  display: grid; place-items: center;
+  background: var(--surface); color: var(--text-soft);
+  font-size: 17px; font-weight: 700;
+  border: 1px solid var(--border);
+}
+.obj.is-hazard .obj-dir { color: var(--danger); border-color: var(--danger-line); }
+
+.obj-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.obj-name { display: block; font-size: 15px; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.obj-meta { display: block; font-size: 12.5px; color: var(--text-soft); margin-top: 1px; }
+
+.obj-conf {
+  flex-shrink: 0; font-size: 13px; font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--text-soft);
+}
+
+/* ============================== SETTINGS ============================== */
+
+.sheet-backdrop {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(15, 23, 42, .35);
+  animation: fade .18s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+
+.sheet {
+  position: fixed; z-index: 100;
+  left: 0; right: 0; bottom: 0;
+  max-height: 88vh;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -6px 28px rgba(15,23,42,.16);
+  display: flex; flex-direction: column;
+  animation: slideUp .22s cubic-bezier(.32,.72,.35,1);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@keyframes slideUp { from { transform: translateY(100%); } }
+
+.sheet-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px var(--pad) 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sheet-head h2 { font-size: 18px; font-weight: 700; }
+
+.sheet-body { overflow-y: auto; padding: 6px var(--pad) var(--pad); }
+
+.setting {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.setting-block { flex-direction: column; align-items: stretch; gap: 8px; }
+.setting:last-of-type { border-bottom: none; }
+
+.set-label { font-size: 15px; font-weight: 600; }
+.set-hint  { font-size: 13px; color: var(--text-soft); }
+
+.slider-row { display: flex; align-items: center; gap: 12px; }
+.slider-row input[type="range"] {
+  flex: 1; height: var(--tap); accent-color: var(--primary); cursor: pointer;
+}
+.slider-out {
+  min-width: 52px; text-align: right;
+  font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+
+.sheet-note {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--surface-sunk); border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--text-soft); line-height: 1.55;
+}
+.sheet-meta { margin-top: 12px; font-size: 12px; color: var(--text-faint); line-height: 1.7; }
+
+/* ============================== FOOTER ============================== */
+
+.app-footer {
+  max-width: 1180px; margin: 0 auto;
+  padding: 4px var(--pad) 28px;
+  text-align: center; font-size: 12.5px; color: var(--text-faint);
+}
+
+/* ============================ RESPONSIVE ============================ */
+
+/* Narrow phones (320px): tighten padding and let metrics wrap to 2x2. */
+@media (max-width: 359px) {
+  :root { --pad: 12px; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .brand-sub { display: none; }
+  .seg-btn span { font-size: 13px; }
+  .guide-en { font-size: 17px; }
+  .lang-bn .guide-bn { font-size: 19px; }
+}
+
+/* Large phones: the arrow can grow. */
+@media (min-width: 430px) {
+  .arrow { width: 70px; height: 70px; font-size: 38px; }
+}
+
+/* Tablet: actions sit on one row; settings become a side sheet. */
+@media (min-width: 700px) {
+  :root { --pad: 20px; }
+  .layout { padding: 20px; gap: 18px; }
+  .actions .btn { flex: 0 1 auto; min-width: 150px; }
+  .guide-en { font-size: 21px; }
+  .lang-bn .guide-bn { font-size: 24px; }
+
+  .sheet {
+    left: auto; top: 0; right: 0; bottom: 0;
+    width: 400px; max-height: none;
+    border-radius: 0;
+    animation: slideIn .22s cubic-bezier(.32,.72,.35,1);
+  }
+  @keyframes slideIn { from { transform: translateX(100%); } }
+}
+
+/* Desktop: two columns, detection left, guidance right. Guidance returns to
+   its natural order because both are visible at once. */
+@media (min-width: 1000px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(330px, .85fr);
+    align-items: start;
+  }
+  .col-guide { position: sticky; top: 78px; }
+  .viewport { aspect-ratio: 16 / 9; }
+  .guide-en { font-size: 22px; }
+  .lang-bn .guide-bn { font-size: 26px; }
+  .arrow { width: 76px; height: 76px; font-size: 42px; }
+}
+
+@media (min-width: 1400px) {
+  .layout { max-width: 1300px; }
+  .header-inner, .app-footer, .notice { max-width: 1300px; }
+}
+
+/* ========================== USER PREFERENCES ========================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Respect a forced-colours / high-contrast environment by letting the OS
+   palette through and keeping borders that would otherwise be tinted. */
+@media (forced-colors: active) {
+  .card, .status, .obj, .metric, .dropzone { border: 1px solid CanvasText; }
+  .dir.is-on, .dir.is-alert, .seg-btn.is-active, .lang-btn.is-active { forced-color-adjust: none; }
+}
+
+
+/* ==================== DEVICE CAMERA (getUserMedia) ==================== */
+/* The phone's own camera plus the box overlay. object-fit: contain keeps the
+   whole frame visible and never crops a hazard out of view -- the overlay maths
+   in app.js maps boxes through that same letterbox. */
+
+#localVideo {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  background: #0b1220;
+}
+
+#overlay {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;          /* never swallow a tap meant for a button */
+}
+
+.source-row { display: flex; }
+.segmented--sm { width: 100%; }
+.segmented--sm .seg-btn { font-size: 13px; min-height: var(--tap); }
+.seg-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* On a phone the camera is the whole point, so give it more of the screen and
+   keep the guidance card reachable without scrolling past a letterboxed frame. */
+@media (max-width: 699px) {
+  .viewport { aspect-ratio: 3 / 4; }
+}
+@media (max-width: 699px) and (orientation: landscape) {
+  .viewport { aspect-ratio: 16 / 9; }
+}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>VisionAssist AI — Models and Classes</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 17mm 15mm 18mm 15mm; }
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Source Serif 4", "Noto Sans Bengali", Georgia, serif;
+  font-size: 10pt; line-height: 1.5; color: #16181d; margin: 0;
+}
+h1,h2,h3 { font-family: "Source Serif 4", Georgia, serif; color: #0f1218; }
+h1 { font-size: 22pt; line-height: 1.15; margin: 0 0 4pt; letter-spacing: -.3pt; }
+h2 { font-size: 13.5pt; margin: 17pt 0 6pt; padding-bottom: 4pt;
+     border-bottom: 1.6pt solid #1f2937; break-after: avoid; }
+h3 { font-size: 11pt; margin: 12pt 0 4pt; break-after: avoid; }
+p { margin: 0 0 6pt; }
+ul, ol { margin: 0 0 7pt; padding-left: 15pt; }
+li { margin-bottom: 3pt; }
+p, li { orphans: 2; widows: 2; }
+
+code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 8.6pt;
+       background: #f1f3f6; padding: .5pt 3pt; border-radius: 2pt; }
+pre { font-family: "IBM Plex Mono", monospace; font-size: 8pt; line-height: 1.4;
+      background: #f7f8fa; border: .6pt solid #dfe3e9; border-left: 2.4pt solid #4f46e5;
+      border-radius: 3pt; padding: 8pt 10pt; margin: 6pt 0 8pt; white-space: pre;
+      break-inside: avoid; }
+
+table { width: 100%; border-collapse: collapse; font-size: 8.6pt;
+        margin: 5pt 0 9pt; break-inside: avoid; }
+th { background: #1f2937; color: #fff; text-align: left; padding: 4.5pt 5pt;
+     font-weight: 600; font-size: 8.2pt; }
+td { padding: 4pt 5pt; border-bottom: .5pt solid #e3e6eb; vertical-align: top; }
+tr:nth-child(even) td { background: #fafbfc; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.c, th.c { text-align: center; }
+
+.bn { font-family: "Noto Sans Bengali", sans-serif; }
+
+.cover { border-bottom: 2.4pt solid #4f46e5; padding-bottom: 11pt; margin-bottom: 14pt; }
+.sub { font-size: 11pt; color: #4b5563; margin: 3pt 0 0; font-style: italic; }
+.meta { font-size: 8.5pt; color: #6b7280; margin-top: 8pt; line-height: 1.65; }
+
+.callout { background: #f8f6ff; border: .6pt solid #d9d2f5; border-left: 2.6pt solid #4f46e5;
+           padding: 7pt 10pt; margin: 8pt 0; border-radius: 3pt; break-inside: avoid; }
+.warn { background: #fff8f0; border: .6pt solid #f3ddc0; border-left: 2.6pt solid #d97706;
+        padding: 7pt 10pt; margin: 8pt 0; border-radius: 3pt; break-inside: avoid; }
+.callout p:last-child, .warn p:last-child { margin-bottom: 0; }
+
+.tag { display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 7pt;
+       font-weight: 500; padding: 1pt 4.5pt; border-radius: 8pt; white-space: nowrap; }
+.t-trained { background: #dcfce7; color: #14532d; }
+.t-pre     { background: #dbeafe; color: #1e3a5f; }
+.t-off     { background: #ede9fe; color: #4c1d95; }
+.t-hi      { background: #fee2e2; color: #7f1d1d; }
+.t-mid     { background: #fef3c7; color: #713f12; }
+.t-lo      { background: #f1f5f9; color: #334155; }
+
+.good { color: #15803d; font-weight: 600; }
+.bad  { color: #b91c1c; font-weight: 600; }
+.mid  { color: #b45309; font-weight: 600; }
+footer.note { margin-top: 14pt; padding-top: 6pt; border-top: .6pt solid #d5d9e0;
+              font-size: 7.6pt; color: #6b7280; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Models and Object Classes</h1>
+  <p class="sub">VisionAssist AI &mdash; Object Detection and Navigation Assistance for Visually Impaired Individuals</p>
+  <p class="meta">
+    Every model file, class name and figure below was read directly from the running project
+    on 9 September 2026 &mdash; from the trained weights, <code>data.yaml</code>,
+    <code>backend/detector.py</code>, <code>backend/navigation/navigation_engine.py</code>
+    and <code>scripts/autolabel.py</code>. Nothing is quoted from documentation or memory.
+  </p>
+</div>
+
+<h2>1. Every model in the system</h2>
+
+<table>
+  <tr>
+    <th style="width:15%">Stage</th>
+    <th style="width:22%">Model</th>
+    <th style="width:11%">Type</th>
+    <th style="width:14%">Classes</th>
+    <th>Why this one</th>
+  </tr>
+  <tr>
+    <td><strong>Detection</strong><br>(primary)</td>
+    <td><code>best.pt</code><br>YOLO11n fine-tuned<br>2,591,595 params<br>5.5&nbsp;MB</td>
+    <td><span class="tag t-trained">TRAINED</span></td>
+    <td>9 footpath classes<br>(&sect;2)</td>
+    <td>Single-stage, so boxes and classes come out of one forward pass &mdash; a two-stage
+        detector cannot meet the latency a walking pace demands. The <em>nano</em> size is
+        forced by 4&nbsp;GB of VRAM shared with the display and with a second model.
+        Measured 19.0&nbsp;ms per frame.</td>
+  </tr>
+  <tr>
+    <td><strong>Detection</strong><br>(indoor)</td>
+    <td><code>yolo11n.pt</code><br>COCO-pretrained</td>
+    <td><span class="tag t-pre">PRE-TRAINED</span></td>
+    <td>12 indoor classes<br>(&sect;3)</td>
+    <td>The thesis dataset is Dhaka footpaths and holds almost no indoor imagery, so indoor
+        classes could not honestly be trained from it. Rather than claim a capability the
+        data cannot support, a COCO model supplies furniture only.</td>
+  </tr>
+  <tr>
+    <td><strong>Annotation</strong><br>(offline)</td>
+    <td><code>yolov8x-worldv2.pt</code><br>YOLO-World, open-vocabulary</td>
+    <td><span class="tag t-off">OFFLINE</span></td>
+    <td>35 text prompts<br>&rarr; 9 classes (&sect;5)</td>
+    <td>The raw pool of 21,359 images had zero annotations, the step at which this project
+        had stalled before. An open-vocabulary detector proposes boxes from plain-language
+        prompts, which a human then reviews. <strong>It never runs at inference time.</strong></td>
+  </tr>
+  <tr>
+    <td><strong>Speech</strong><br>(Bengali)</td>
+    <td><code>bn-BD-NabanitaNeural</code><br>via edge-tts</td>
+    <td><span class="tag t-pre">NEURAL TTS</span></td>
+    <td>&mdash;</td>
+    <td>Windows SAPI5 on this machine has no Bengali voice installed, so the offline engine
+        physically cannot speak Bengali. This is free, needs no API key, and is the best
+        Bengali quality available. Requires internet.</td>
+  </tr>
+  <tr>
+    <td><strong>Speech</strong><br>(English)</td>
+    <td><code>pyttsx3</code> &rarr; Windows SAPI5</td>
+    <td><span class="tag t-pre">SYSTEM TTS</span></td>
+    <td>&mdash;</td>
+    <td>Offline and instant. No round trip, so an English warning is never delayed by the
+        network.</td>
+  </tr>
+</table>
+
+<p>Three further Bengali neural voices are configured as alternates and can be selected without
+a code change: <code>bn-BD-PradeepNeural</code> (male, Bangladesh),
+<code>bn-IN-BashkarNeural</code> and <code>bn-IN-TanishaaNeural</code> (India). The Bangladesh
+voice is the default because the users are Bangladeshi.</p>
+
+<div class="callout">
+  <p><strong>No model performs navigation.</strong> Deciding which obstacle matters and whether
+  to speak is a deterministic rule engine, not a network. It needs no training data, fails in
+  ways that can be enumerated in advance, and can be defended line by line in a viva &mdash; all
+  three of which matter more than sophistication in assistive software.</p>
+</div>
+
+<h2>2. The nine trained classes</h2>
+
+<p>These are the classes the thesis model was actually trained on. The list was fixed before
+annotation began and never reordered, because the class index is baked into every label file:
+reordering would silently relabel the whole dataset.</p>
+
+<p><strong>The rule that produced this list:</strong> every class must map to an action the
+navigation layer can express in a sentence. Nothing decorative was included. A footpath contains
+hundreds of nameable things &mdash; shop signs, litter, parked bicycles' shadows &mdash; but a blind
+pedestrian only needs the ones that change where the next step goes.</p>
+
+<table>
+  <tr>
+    <th class="c" style="width:4%">ID</th>
+    <th style="width:14%">Class</th>
+    <th style="width:13%">Bengali</th>
+    <th style="width:26%">What it covers</th>
+    <th>Why it is in the list</th>
+  </tr>
+  <tr><td class="c">0</td><td><code>person</code></td><td class="bn">মানুষ</td>
+      <td>Pedestrians, standing or walking</td>
+      <td>Collision risk, and the dominant obstacle in a Dhaka crowd.</td></tr>
+  <tr><td class="c">1</td><td><code>pole</code></td><td class="bn">খুঁটি</td>
+      <td>Electric, utility and sign poles; guy-wire anchor posts planted mid-path</td>
+      <td>The single most common fixed obstruction in the middle of a Dhaka footpath.</td></tr>
+  <tr><td class="c">2</td><td><code>tree</code></td><td class="bn">গাছ</td>
+      <td>Trunks growing through the walkway</td>
+      <td>Head and body collision; a cane sweeping low can miss a trunk at chest height.</td></tr>
+  <tr><td class="c">3</td><td><code>stairs</code></td><td class="bn">সিঁড়ি</td>
+      <td>Steps up or down, kerb ramps, shop entrance steps</td>
+      <td>Fall risk. Needs a distinct warning because the correct response is to stop, not
+          to step around.</td></tr>
+  <tr><td class="c">4</td><td><code>pothole</code></td><td class="bn">গর্ত</td>
+      <td>Broken or missing pavement, sunken slabs, rubble craters</td>
+      <td>Trip and ankle injury. Invisible to a cane until contact.</td></tr>
+  <tr><td class="c">5</td><td><code>open_drain</code></td><td class="bn">খোলা ড্রেন</td>
+      <td>Uncovered drains, missing or displaced manhole covers</td>
+      <td>The most dangerous class in the set: a fall into an open drain is a serious injury,
+          and covers go missing often enough in Dhaka that this is routine, not hypothetical.</td></tr>
+  <tr><td class="c">6</td><td><code>parked_vehicle</code></td><td class="bn">পার্ক করা গাড়ি</td>
+      <td>Rickshaw, CNG auto, motorcycle, car or van parked on or across the footpath</td>
+      <td>Blocks the walkway entirely and forces a step into traffic.</td></tr>
+  <tr><td class="c">7</td><td><code>street_obstacle</code></td><td class="bn">রাস্তার প্রতিবন্ধকতা</td>
+      <td>Vendor stalls, construction material, bricks, sand piles, bins, hanging signboards</td>
+      <td>Forces a detour. Deliberately one broad class: the required action is identical for
+          all of them, so splitting it would add annotation cost without changing any
+          instruction.</td></tr>
+  <tr><td class="c">8</td><td><code>curb</code></td><td class="bn">ফুটপাতের কিনারা</td>
+      <td>The footpath edge where it drops to the road</td>
+      <td>The boundary between safe surface and live traffic &mdash; arguably the single most
+          important line to stay on the correct side of.</td></tr>
+</table>
+
+<h3>2.1 How much data each class actually got, and what it achieved</h3>
+
+<table>
+  <tr>
+    <th style="width:18%">Class</th>
+    <th class="num">Train</th><th class="num">Val</th><th class="num">Test</th>
+    <th class="num">AP@0.5</th><th class="num">Recall</th>
+    <th>Verdict</th>
+  </tr>
+  <tr><td><code>parked_vehicle</code></td><td class="num">9,290</td><td class="num">2,652</td><td class="num">1,360</td>
+      <td class="num good">0.781</td><td class="num">0.688</td><td>Reliable</td></tr>
+  <tr><td><code>person</code></td><td class="num">6,178</td><td class="num">1,750</td><td class="num">878</td>
+      <td class="num good">0.837</td><td class="num">0.749</td><td>Reliable</td></tr>
+  <tr><td><code>street_obstacle</code></td><td class="num">549</td><td class="num">183</td><td class="num">99</td>
+      <td class="num mid">0.295</td><td class="num">0.267</td><td>Weak</td></tr>
+  <tr><td><code>tree</code></td><td class="num">422</td><td class="num">118</td><td class="num">65</td>
+      <td class="num mid">0.237</td><td class="num">0.262</td><td>Weak</td></tr>
+  <tr><td><code>curb</code></td><td class="num">144</td><td class="num">35</td><td class="num">20</td>
+      <td class="num mid">0.359</td><td class="num">0.450</td><td>Weak</td></tr>
+  <tr><td><code>pole</code></td><td class="num">109</td><td class="num">35</td><td class="num">9</td>
+      <td class="num mid">0.268</td><td class="num">0.222</td><td>Too few to judge</td></tr>
+  <tr><td><code>stairs</code></td><td class="num bad">17</td><td class="num">4</td><td class="num bad">2</td>
+      <td class="num">0.995 *</td><td class="num">1.000</td><td>Noise, not evidence</td></tr>
+  <tr><td><code>pothole</code></td><td class="num bad">17</td><td class="num">3</td><td class="num bad">1</td>
+      <td class="num bad">0.000</td><td class="num bad">0.000</td><td>Not detected</td></tr>
+  <tr><td><code>open_drain</code></td><td class="num bad">12</td><td class="num">9</td><td class="num bad">1</td>
+      <td class="num bad">0.000</td><td class="num bad">0.000</td><td>Not detected</td></tr>
+</table>
+
+<div class="warn">
+  <p><strong>Read this table before quoting any class result.</strong> Per-class AP tracks
+  instance count almost monotonically, which says the binding constraint is annotation
+  coverage &mdash; not model capacity and not training length.</p>
+  <p><strong>*</strong> <code>stairs</code> at 0.995 is computed over <em>two</em> test boxes.
+  That is statistical noise. <code>pothole</code> and <code>open_drain</code> show zero recall:
+  the model predicts neither class at all, and their precision of 1.000 is the convention used
+  when no positive prediction was ever made, not a sign of quality.</p>
+  <p><strong>The consequence must be stated plainly:</strong> the system is reliable on people
+  and vehicles and is <em>blind to the three fall hazards</em> that motivated the class list.
+  Section 5 explains why those classes were starved of data.</p>
+</div>
+
+<h2>3. The twelve indoor classes</h2>
+
+<p>Supplied at runtime by the COCO-pretrained model, never by the thesis model. The fusion rule
+is in <code>backend/detector.py</code>.</p>
+
+<table>
+  <tr><th style="width:16%">Class</th><th style="width:16%">Bengali</th><th>Why it is included</th></tr>
+  <tr><td><code>chair</code></td><td class="bn">চেয়ার</td><td>The commonest indoor trip hazard; legs are low and a cane can pass between them.</td></tr>
+  <tr><td><code>dining table</code></td><td class="bn">টেবিল</td><td>Waist-height edge, and the class COCO uses for tables generally.</td></tr>
+  <tr><td><code>bed</code></td><td class="bn">বিছানা</td><td>Large low obstacle that defines the walkable area of a room.</td></tr>
+  <tr><td><code>couch</code></td><td class="bn">সোফা</td><td>As above; distinguished from <code>bed</code> by COCO, so kept separate.</td></tr>
+  <tr><td><code>bench</code></td><td class="bn">বেঞ্চ</td><td>Appears indoors and on footpaths; useful in both.</td></tr>
+  <tr><td><code>potted plant</code></td><td class="bn">গাছের টব</td><td>Frequently placed in corridors and doorways.</td></tr>
+  <tr><td><code>tv</code></td><td class="bn">টেলিভিশন</td><td>Wall- or stand-mounted at head height.</td></tr>
+  <tr><td><code>refrigerator</code></td><td class="bn">ফ্রিজ</td><td>Full-height fixed obstacle; a useful landmark for orientation.</td></tr>
+  <tr><td><code>oven</code></td><td class="bn">ওভেন</td><td>Protruding appliance at waist height.</td></tr>
+  <tr><td><code>microwave</code></td><td class="bn">মাইক্রোওয়েভ</td><td>Counter-height protrusion.</td></tr>
+  <tr><td><code>sink</code></td><td class="bn">সিংক</td><td>Fixed waist-height obstacle; orients a user in a kitchen or washroom.</td></tr>
+  <tr><td><code>toilet</code></td><td class="bn">টয়লেট</td><td>Orientation landmark in an unfamiliar washroom.</td></tr>
+</table>
+
+<h3>3.1 The two rules that keep the fusion honest</h3>
+<pre>
+frame ──┬─▶ thesis best.pt  (9 classes)  ─────────────┐
+        │                                             │
+        └─▶ COCO yolo11n ──▶ keep ONLY the 12 above ──┤
+                                                      ▼
+                                          overlap &gt; 0.55 IoU ?
+                                          yes ─▶ drop the COCO box
+                                          no  ─▶ keep it
+</pre>
+<ol>
+  <li><strong>The indoor model is excluded from every class the thesis model covers</strong> &mdash;
+      notably <code>person</code>, which both can detect. Without this the same pedestrian would
+      be listed and announced twice.</li>
+  <li><strong>On any overlap above 0.55 IoU the thesis model wins</strong>, because it is the
+      model trained on this thesis's data.</li>
+</ol>
+
+<div class="warn">
+  <p><strong>Declare this in the defence.</strong> These twelve classes are COCO-pretrained and
+  carry <strong>no thesis-measured mAP</strong>. They are a deployment convenience, not a
+  research contribution.</p>
+  <p><code>door</code> is deliberately absent. COCO has no door class and the thesis dataset has
+  no door annotations, so supporting it would mean inventing a capability that was never
+  measured.</p>
+</div>
+
+<h2>4. How the classes are ranked</h2>
+
+<p>Not every class carries equal weight. The navigation engine sorts detections by a score whose
+terms are readable rather than tuned, so any ordering can be explained.</p>
+
+<table>
+  <tr><th style="width:12%">Tier</th><th class="num" style="width:10%">Score</th><th>Classes</th><th style="width:26%">Reasoning</th></tr>
+  <tr>
+    <td><span class="tag t-hi">DANGER</span></td><td class="num">+100</td>
+    <td><code>pothole</code> <code>open_drain</code> <code>stairs</code> <code>curb</code>
+        <code>pole</code> <code>car</code> <code>bus</code> <code>truck</code>
+        <code>motorcycle</code> <code>bicycle</code> <code>train</code></td>
+    <td>Fall or vehicle-collision hazards. A mistake here injures.</td>
+  </tr>
+  <tr>
+    <td><span class="tag t-mid">INDOOR</span></td><td class="num">+40</td>
+    <td>The twelve furniture classes of &sect;3</td>
+    <td>Worth announcing, but walking into a chair is not walking into an open drain.</td>
+  </tr>
+  <tr>
+    <td><span class="tag t-lo">OTHER</span></td><td class="num">0</td>
+    <td><code>person</code>, <code>tree</code>, <code>street_obstacle</code>,
+        <code>parked_vehicle</code> and remaining COCO classes</td>
+    <td>Announced on geometry alone. A person is usually avoidable and often moves.</td>
+  </tr>
+  <tr>
+    <td colspan="2"><strong>Geometry</strong></td>
+    <td>CENTER&nbsp;+50 &nbsp;·&nbsp; NEAR&nbsp;+30 / MEDIUM&nbsp;+12 / FAR&nbsp;0 &nbsp;·&nbsp;
+        confidence&nbsp;&times;&nbsp;10</td>
+    <td>Position and proximity dominate confidence, so the detector's certainty can never
+        outrank being directly in the path.</td>
+  </tr>
+</table>
+
+<p>A further <strong>31 COCO classes are permanently ignored</strong> and never announced &mdash;
+food, sports equipment, small handheld items such as <code>toothbrush</code>,
+<code>book</code> and <code>cell phone</code>. They are real detections but nothing a
+pedestrian navigates around, and narrating them would bury the warnings that matter.</p>
+
+<h2>5. Prompts used to annotate each class</h2>
+
+<p>YOLO-World was driven with several descriptive phrases per class rather than the bare class
+name; open-vocabulary detectors respond markedly better to a description than to a label, and
+several phrasings recover objects any single phrasing misses. Thirty-five prompts map back onto
+the nine classes.</p>
+
+<table>
+  <tr><th style="width:17%">Class</th><th>Prompts</th><th class="num" style="width:11%">Boxes found</th></tr>
+  <tr><td><code>person</code></td><td>person &middot; pedestrian walking &middot; man standing &middot; woman walking</td><td class="num">8,820</td></tr>
+  <tr><td><code>pole</code></td><td>utility pole &middot; electric pole on footpath &middot; lamp post &middot; sign post</td><td class="num">153</td></tr>
+  <tr><td><code>tree</code></td><td>tree trunk &middot; tree growing on pavement</td><td class="num">606</td></tr>
+  <tr><td><code>stairs</code></td><td>stairs &middot; concrete steps &middot; staircase entrance</td><td class="num bad">23</td></tr>
+  <tr><td><code>pothole</code></td><td>pothole &middot; broken pavement &middot; hole in the road surface &middot; damaged footpath tiles</td><td class="num bad">21</td></tr>
+  <tr><td><code>open_drain</code></td><td>open drain &middot; uncovered drain &middot; manhole without cover &middot; open sewer gap in pavement</td><td class="num bad">22</td></tr>
+  <tr><td><code>parked_vehicle</code></td><td>parked car &middot; rickshaw &middot; auto rickshaw &middot; parked motorcycle &middot; parked van &middot; bicycle parked on footpath</td><td class="num">13,328</td></tr>
+  <tr><td><code>street_obstacle</code></td><td>street vendor stall &middot; pile of bricks &middot; construction material &middot; garbage bin &middot; sand pile on footpath &middot; signboard on pavement</td><td class="num">833</td></tr>
+  <tr><td><code>curb</code></td><td>kerb edge of footpath &middot; raised pavement edge</td><td class="num">204</td></tr>
+</table>
+
+<div class="warn">
+  <p><strong>This table is the root cause of the failures in &sect;2.1.</strong> Three classes
+  &mdash; <code>pothole</code>, <code>open_drain</code> and <code>curb</code> &mdash; are flagged in the
+  code as <code>LOW_TRUST</code> because the annotation model cannot find them.</p>
+  <p>A pothole has no consistent visual prototype: it is defined by the <em>absence</em> of
+  intact surface, not by a characteristic shape, and is easily confused with a shadow, a repair
+  patch or an ordinary paving seam. The open-vocabulary model therefore proposed almost no
+  candidates, the human review had almost nothing to confirm, and those classes reached training
+  with 12&ndash;17 instances.</p>
+  <p>The fix is annotation, not architecture: hand-draw 100&ndash;200 instances of each hazard class
+  and retrain. The images already exist in the unused pool.</p>
+</div>
+
+<h2>6. Summary</h2>
+
+<table>
+  <tr><th style="width:34%">Question</th><th>Answer</th></tr>
+  <tr><td>How many models run at inference?</td>
+      <td><strong>Two</strong> detectors (thesis <code>best.pt</code> + COCO <code>yolo11n.pt</code>)
+          and one text-to-speech voice per language.</td></tr>
+  <tr><td>How many classes can be detected?</td>
+      <td><strong>21</strong> &mdash; 9 trained on thesis data, 12 borrowed from COCO.</td></tr>
+  <tr><td>How many are thesis contributions?</td>
+      <td><strong>9.</strong> Only these carry measured mAP.</td></tr>
+  <tr><td>How many work reliably today?</td>
+      <td><strong>2</strong> (<code>person</code>, <code>parked_vehicle</code>). Four are weak,
+          three are not detected at all.</td></tr>
+  <tr><td>Which model is <em>not</em> in the running system?</td>
+      <td><code>yolov8x-worldv2.pt</code> &mdash; annotation only, offline.</td></tr>
+  <tr><td>Which component uses no model?</td>
+      <td>Navigation, spatial reasoning and sentence generation &mdash; all deterministic rules.</td></tr>
+</table>
+
+<footer class="note">
+  VisionAssist AI &mdash; Object Detection and Navigation Assistance for Visually Impaired
+  Individuals. Research prototype: experimental computer-vision assistance, not to be relied
+  upon as the sole navigation aid for real-world mobility. All class names and counts read
+  from the project source and trained weights on 9 September 2026.
+</footer>
+
+</body>
+</html>

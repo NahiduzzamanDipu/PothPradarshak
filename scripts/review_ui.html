@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Label Review · VisionAssist</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Same visual language as the main application, trimmed to a working tool. */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f1c; --panel:#111827; --panel-light:#182235;
+  --border:rgba(255,255,255,.08); --text:#f8fafc; --muted:#94a3b8;
+  --primary:#6366f1; --success:#22c55e; --danger:#ef4444; --warning:#f59e0b;
+}
+body{font-family:"Noto Sans Bengali",Arial,Helvetica,sans-serif;background:var(--bg);
+     color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+header{height:56px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;
+       border-bottom:1px solid var(--border);background:rgba(10,15,28,.9);flex-shrink:0}
+h1{font-size:15px}
+.progress{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted)}
+.bar{width:220px;height:7px;border-radius:5px;background:var(--panel-light);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--success);width:0;transition:width .3s}
+.main{flex:1;display:grid;grid-template-columns:1fr 290px;gap:14px;padding:14px;min-height:0}
+.stage{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+       display:flex;align-items:center;justify-content:center;position:relative;
+       overflow:hidden;min-width:0;padding:8px}
+/* The source footpath images are only 256x256. Shown at native size they are
+   a postage stamp on a 1080p screen and boxes cannot be placed accurately, so
+   they are scaled UP to fill the stage. pixelated keeps the upscale honest -
+   smoothing invents edges that are not in the data. */
+#wrap{position:relative;line-height:0;display:inline-block}
+#img{display:block;user-select:none;-webkit-user-drag:none;
+     max-width:100%;max-height:calc(100vh - 130px);
+     width:auto;height:calc(100vh - 130px);
+     object-fit:contain;image-rendering:pixelated}
+#svg{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+.side{display:flex;flex-direction:column;gap:12px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px}
+.card h2{font-size:12px;color:var(--muted);margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px}
+.fname{font-size:12px;word-break:break-all;color:var(--muted)}
+.boxlist{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:60px}
+.boxrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;
+        border-radius:8px;background:rgba(255,255,255,.04);border:1px solid transparent;
+        font-size:12px;cursor:pointer}
+.boxrow.sel{border-color:var(--primary);background:rgba(99,102,241,.15)}
+.boxrow .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.boxrow button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:0 3px}
+.empty{color:#64748b;font-size:11px;padding:6px 2px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+button.act{border:none;border-radius:9px;padding:11px;font-size:12px;font-weight:600;
+           cursor:pointer;color:#fff;font-family:inherit}
+button.act:disabled{opacity:.6;cursor:progress}
+.b-accept{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.b-skip{background:rgba(255,255,255,.07);border:1px solid var(--border)}
+.b-prev{background:rgba(255,255,255,.07);border:1px solid var(--border)}
+.b-export{background:linear-gradient(135deg,#6366f1,#4f46e5)}
+.classes{display:flex;flex-direction:column;gap:4px;max-height:230px;overflow-y:auto}
+.cls{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;font-size:12px;
+     cursor:pointer;background:rgba(255,255,255,.03)}
+.cls:hover{background:rgba(255,255,255,.08)}
+.cls .k{width:17px;height:17px;border-radius:4px;background:var(--panel-light);
+        display:grid;place-items:center;font-size:10px;color:var(--muted);flex-shrink:0}
+.cls .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.hint{font-size:10px;color:#64748b;line-height:1.7}
+.hint b{color:var(--muted);font-weight:600}
+.exported{margin-top:9px;padding:7px 9px;border-radius:7px;font-size:11px;
+          background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);
+          color:#86efac}
+[hidden]{display:none!important}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);
+       background:var(--panel-light);border:1px solid var(--border);border-radius:9px;
+       padding:9px 16px;font-size:12px;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
+.warn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);
+      color:#fde68a;font-size:11px;padding:8px 10px;border-radius:8px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Label Review <span style="color:var(--muted);font-weight:400">· candidate boxes are unverified</span></h1>
+  <div class="progress">
+    <span id="stat">—</span>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="stage">
+    <div id="wrap">
+      <img id="img" alt="">
+      <svg id="svg" preserveAspectRatio="none"></svg>
+    </div>
+  </div>
+
+  <aside class="side">
+    <div class="card">
+      <h2>Image</h2>
+      <div class="fname" id="fname">—</div>
+    </div>
+
+    <div class="card" style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <h2>Boxes <span id="boxcount" style="color:var(--muted)"></span></h2>
+      <div class="boxlist" id="boxlist"></div>
+    </div>
+
+    <div class="card">
+      <h2>Class of selected box</h2>
+      <div class="classes" id="classes"></div>
+    </div>
+
+    <div class="card">
+      <div class="btns">
+        <button class="act b-accept" id="bAccept">Accept ▸</button>
+        <button class="act b-skip"   id="bSkip">Skip</button>
+        <button class="act b-prev"   id="bPrev">◂ Back</button>
+        <button class="act b-export" id="bExport">Export</button>
+      </div>
+      <div class="hint" style="margin-top:10px">
+        <b>A</b> accept &nbsp; <b>D</b> delete box &nbsp; <b>1-9</b> class<br>
+        <b>N</b> skip &nbsp; <b>Backspace</b> back &nbsp; drag to draw
+      </div>
+      <div class="exported" id="exportNote" hidden></div>
+    </div>
+
+    <div class="warn">
+      Boxes start as machine guesses. An image counts as ground truth only once
+      you accept it. Delete what is wrong before accepting.
+    </div>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+const PALETTE = ["#60a5fa","#f472b6","#4ade80","#fbbf24","#f87171",
+                 "#a78bfa","#22d3ee","#fb923c","#94a3b8"];
+
+const state = {
+  images: [], idx: 0, boxes: [], sel: -1,
+  names: [], namesBn: [], verified: new Set(), dirty: false
+};
+
+const $ = (id) => document.getElementById(id);
+const img = $("img"), svg = $("svg");
+
+function toast(msg, ms) {
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove("show"), ms || 1400);
+}
+
+/* ------------------------------------------------------------------ load */
+
+async function boot() {
+  const cls = await (await fetch("/api/classes")).json();
+  state.names = cls.names; state.namesBn = cls.names_bn;
+
+  const list = await (await fetch("/api/list")).json();
+  state.images = list.images;
+  state.verified = new Set(list.verified);
+  updateStats(list.stats);
+  renderClasses();
+
+  // Resume at the first image that has not been verified yet.
+  const first = state.images.findIndex((n) => !state.verified.has(n));
+  state.idx = first === -1 ? 0 : first;
+  await load();
+}
+
+function updateStats(s) {
+  $("stat").textContent = s.verified + " / " + s.total + " verified";
+  $("barfill").style.width = s.percent + "%";
+}
+
+async function load() {
+  if (state.idx < 0) state.idx = 0;
+  if (state.idx >= state.images.length) {
+    toast("All images reviewed - press Export");
+    state.idx = state.images.length - 1;
+  }
+  const name = state.images[state.idx];
+  $("fname").textContent = (state.idx + 1) + " / " + state.images.length + "  ·  " + name;
+
+  const data = await (await fetch("/api/boxes/" + encodeURIComponent(name))).json();
+  state.boxes = data.boxes || [];
+  state.sel = state.boxes.length ? 0 : -1;
+  state.dirty = false;
+
+  await new Promise((res) => {
+    img.onload = res;
+    img.onerror = res;
+    img.src = "/api/image/" + encodeURIComponent(name);
+  });
+  draw();
+}
+
+/* ------------------------------------------------------------------ draw */
+
+function draw() {
+  const w = img.clientWidth, h = img.clientHeight;
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  svg.style.width = w + "px"; svg.style.height = h + "px";
+
+  let out = "";
+  state.boxes.forEach((b, i) => {
+    const x = (b.cx - b.w / 2) * w, y = (b.cy - b.h / 2) * h;
+    const bw = b.w * w, bh = b.h * h;
+    const col = PALETTE[b.cls % PALETTE.length];
+    const sel = i === state.sel;
+    out += '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + bh +
+           '" fill="' + (sel ? col + "22" : "none") + '" stroke="' + col +
+           '" stroke-width="' + (sel ? 3 : 2) + '" data-i="' + i + '" style="cursor:pointer"/>';
+    out += '<rect x="' + x + '" y="' + Math.max(0, y - 17) + '" width="' +
+           Math.max(34, (state.names[b.cls] || "?").length * 7 + 8) +
+           '" height="16" fill="' + col + '"/>';
+    out += '<text x="' + (x + 4) + '" y="' + Math.max(12, y - 5) +
+           '" font-size="11" fill="#0a0f1c" font-family="Arial">' +
+           esc(state.names[b.cls] || b.cls) + "</text>";
+  });
+  svg.innerHTML = out;
+
+  svg.querySelectorAll("rect[data-i]").forEach((r) => {
+    r.addEventListener("mousedown", (e) => {
+      e.stopPropagation();
+      state.sel = Number(r.dataset.i);
+      draw(); renderBoxes();
+    });
+  });
+  renderBoxes();
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderBoxes() {
+  $("boxcount").textContent = "(" + state.boxes.length + ")";
+  if (!state.boxes.length) {
+    $("boxlist").innerHTML = '<div class="empty">No boxes. Drag on the image to add one, ' +
+                             'or accept as an empty background image.</div>';
+    return;
+  }
+  $("boxlist").innerHTML = state.boxes.map((b, i) =>
+    '<div class="boxrow' + (i === state.sel ? " sel" : "") + '" data-i="' + i + '">' +
+      '<span style="display:flex;align-items:center;gap:7px;min-width:0">' +
+        '<span class="sw" style="background:' + PALETTE[b.cls % PALETTE.length] + '"></span>' +
+        '<span>' + esc(state.names[b.cls] || b.cls) + "</span>" +
+      "</span>" +
+      '<button data-del="' + i + '" title="delete">✕</button>' +
+    "</div>").join("");
+
+  $("boxlist").querySelectorAll(".boxrow").forEach((r) => {
+    r.addEventListener("click", (e) => {
+      if (e.target.dataset.del !== undefined) return;
+      state.sel = Number(r.dataset.i); draw();
+    });
+  });
+  $("boxlist").querySelectorAll("[data-del]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      delBox(Number(btn.dataset.del));
+    });
+  });
+}
+
+function renderClasses() {
+  $("classes").innerHTML = state.names.map((n, i) =>
+    '<div class="cls" data-c="' + i + '">' +
+      '<span class="k">' + (i + 1) + "</span>" +
+      '<span class="sw" style="background:' + PALETTE[i % PALETTE.length] + '"></span>' +
+      "<span>" + esc(n) + (state.namesBn[i] ? " · " + esc(state.namesBn[i]) : "") + "</span>" +
+    "</div>").join("");
+  $("classes").querySelectorAll(".cls").forEach((c) => {
+    c.addEventListener("click", () => setClass(Number(c.dataset.c)));
+  });
+}
+
+/* ---------------------------------------------------------------- edits */
+
+function delBox(i) {
+  if (i < 0 || i >= state.boxes.length) return;
+  state.boxes.splice(i, 1);
+  state.sel = Math.min(state.sel, state.boxes.length - 1);
+  state.dirty = true;
+  draw();
+}
+
+function setClass(c) {
+  if (state.sel < 0) { toast("Select a box first"); return; }
+  state.boxes[state.sel].cls = c;
+  state.dirty = true;
+  draw();
+}
+
+/* Drag on empty canvas to draw a new box. */
+let drag = null;
+svg.addEventListener("mousedown", (e) => {
+  if (e.target !== svg) return;
+  const r = svg.getBoundingClientRect();
+  drag = { x0: e.clientX - r.left, y0: e.clientY - r.top };
+});
+window.addEventListener("mousemove", (e) => {
+  if (!drag) return;
+  const r = svg.getBoundingClientRect();
+  drag.x1 = e.clientX - r.left; drag.y1 = e.clientY - r.top;
+  draw();
+  const x = Math.min(drag.x0, drag.x1), y = Math.min(drag.y0, drag.y1);
+  const w = Math.abs(drag.x1 - drag.x0), h = Math.abs(drag.y1 - drag.y0);
+  svg.insertAdjacentHTML("beforeend",
+    '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
+    '" fill="rgba(99,102,241,.15)" stroke="#6366f1" stroke-width="2" stroke-dasharray="4 3"/>');
+});
+window.addEventListener("mouseup", () => {
+  if (!drag || drag.x1 === undefined) { drag = null; return; }
+  const W = img.clientWidth, H = img.clientHeight;
+  const x = Math.min(drag.x0, drag.x1), y = Math.min(drag.y0, drag.y1);
+  const w = Math.abs(drag.x1 - drag.x0), h = Math.abs(drag.y1 - drag.y0);
+  drag = null;
+  if (w < 6 || h < 6) { draw(); return; }   // ignore stray clicks
+  const cls = state.sel >= 0 ? state.boxes[state.sel].cls : 0;
+  state.boxes.push({ cls: cls, cx: (x + w / 2) / W, cy: (y + h / 2) / H, w: w / W, h: h / H });
+  state.sel = state.boxes.length - 1;
+  state.dirty = true;
+  draw();
+});
+
+/* ------------------------------------------------------------- actions */
+
+async function save(verified) {
+  const name = state.images[state.idx];
+  const r = await fetch("/api/save", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: name, boxes: state.boxes, verified: verified })
+  });
+  const d = await r.json();
+  if (d.stats) updateStats(d.stats);
+  if (verified) state.verified.add(name);
+  state.dirty = false;
+}
+
+async function accept() {
+  await save(true);
+  state.idx += 1;
+  await load();
+}
+
+async function skip() {
+  const name = state.images[state.idx];
+  if (state.dirty) await save(false);
+  await fetch("/api/skip/" + encodeURIComponent(name), { method: "POST" });
+  state.idx += 1;
+  await load();
+}
+
+async function prev() {
+  if (state.dirty) await save(false);
+  state.idx -= 1;
+  await load();
+}
+
+$("bAccept").addEventListener("click", accept);
+$("bSkip").addEventListener("click", skip);
+$("bPrev").addEventListener("click", prev);
+/* Exporting copies two files per verified image - at ~2,800 images that is
+   several seconds of silence. Without progress feedback the button looks
+   broken and gets clicked repeatedly, so it reports state and locks itself. */
+$("bExport").addEventListener("click", async () => {
+  const btn = $("bExport");
+  if (btn.disabled) return;
+
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Exporting…";
+  toast("Exporting… copying files, this can take a few seconds.", 60000);
+
+  try {
+    const res = await fetch("/api/export", { method: "POST" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const d = await res.json();
+
+    if (d.exported === 0) {
+      toast("Nothing exported - no images are verified yet.", 6000);
+    } else {
+      toast("Exported " + d.exported + " verified pairs to annotated/ - "
+            + "next: python scripts/prepare_dataset.py", 10000);
+    }
+    $("exportNote").textContent =
+      d.exported + " pairs exported to annotated/";
+    $("exportNote").hidden = false;
+  } catch (err) {
+    toast("Export failed: " + err.message, 8000);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  const k = e.key.toLowerCase();
+  if (k === "a" || e.key === "Enter") { e.preventDefault(); accept(); }
+  else if (k === "d") { e.preventDefault(); delBox(state.sel); }
+  else if (k === "n") { e.preventDefault(); skip(); }
+  else if (k === "s") { e.preventDefault(); save(false).then(() => toast("Saved")); }
+  else if (e.key === "Backspace") { e.preventDefault(); prev(); }
+  else if (/^[1-9]$/.test(e.key)) {
+    const c = Number(e.key) - 1;
+    if (c < state.names.length) { e.preventDefault(); setClass(c); }
+  }
+});
+
+window.addEventListener("resize", draw);
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+# Object Detection and Navigation Assistance for Visually Impaired Individuals
+# ---------------------------------------------------------------------------
+# Install:
+#   python -m venv venv
+#   venv\Scripts\activate           (Windows)
+#   source venv/bin/activate        (Linux / macOS)
+#   pip install -r requirements.txt
+#
+# GPU NOTE: plain `pip install torch` gives the CPU build on Windows/Linux.
+# For an NVIDIA GPU install the CUDA build FIRST, then this file:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# Check what you got - this must print True, not just a version:
+#   python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+#
+# Verified on this project: RTX 3050 Ti Laptop (4 GB), driver 592.00, CUDA 13.1,
+# torch 2.11.0+cu128. Auto-labelling went from 0.42 img/s on CPU to 8.26 img/s
+# on GPU - a ~20x difference, and training is affected far more than that.
+# Pick the cuXXX index matching your driver; cu128 works for CUDA 12.8+.
+
+# ---------------------------------------------------------------------------
+# PART 1 - dataset preparation, training, evaluation
+# ---------------------------------------------------------------------------
+ultralytics>=8.3.0        # YOLO11 training / validation / inference
+torch>=2.2.0              # deep learning backend (see GPU note above)
+torchvision>=0.17.0
+opencv-python>=4.9.0      # image & video IO, webcam, drawing
+numpy>=1.26.0
+pandas>=2.2.0             # results.csv handling, tabular reports
+matplotlib>=3.8.0         # dataset statistics and metric charts
+Pillow>=10.2.0            # image decoding, corruption detection
+PyYAML>=6.0               # data.yaml
+tqdm>=4.66.0              # progress bars (pulled in by ultralytics)
+
+# ---------------------------------------------------------------------------
+# PART 2 - the real-time assistive application
+# ---------------------------------------------------------------------------
+fastapi>=0.110.0          # REST API + MJPEG streaming
+uvicorn>=0.27.0           # ASGI server
+pydantic>=2.6.0           # request validation (pulled in by fastapi)
+python-multipart>=0.0.9   # form parsing for FastAPI
+
+# --- Text to speech -------------------------------------------------------
+# pyttsx3 drives Windows SAPI5. It is OFFLINE and instant, but it can only use
+# the voices Windows has installed - on a default Windows install that means
+# ENGLISH ONLY. It cannot speak Bengali unless you add a Bengali speech pack:
+#   Settings > Time & language > Language & region > Add a language
+#   > "বাংলা (বাংলাদেশ)" > tick "Speech"
+pyttsx3>=2.90
+
+# edge-tts gives free Microsoft neural voices including FOUR Bengali ones
+# (bn-BD-NabanitaNeural, bn-BD-PradeepNeural, bn-IN-BashkarNeural,
+# bn-IN-TanishaaNeural). No API key. REQUIRES AN INTERNET CONNECTION.
+# This is the recommended route for Bengali speech.
+edge-tts>=6.1.0
+
+# gTTS is a simpler online fallback that also supports Bengali (lang="bn").
+gTTS>=2.5.0
+
+# ---------------------------------------------------------------------------
+# PART 3 - machine-assisted annotation (scripts/autolabel.py)
+# ---------------------------------------------------------------------------
+# YOLO-World's open-vocabulary mode (model.set_classes) needs OpenAI CLIP to
+# encode the text prompts. Ultralytics installs it on first use, but pinning it
+# here keeps the pipeline reproducible on a fresh machine.
+#
+# The weights themselves are NOT on PyPI. Fetch them once into models/:
+#   python -c "from ultralytics import YOLO; YOLO('yolov8x-worldv2.pt')"
+clip @ git+https://github.com/openai/CLIP.git
+ftfy>=6.1.0               # text normalisation required by CLIP
+
+# ---------------------------------------------------------------------------
+# Optional - uncomment only if you need them
+# ---------------------------------------------------------------------------
+# label-studio>=1.11.0    # self-hosted annotation tool
+# onnx>=1.16.0            # export for mobile / edge deployment
+# onnxruntime>=1.17.0
+# ncnn                    # Android deployment backend

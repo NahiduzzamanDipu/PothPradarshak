@@ -1,0 +1,135 @@
+# =============================================================================
+# data.yaml
+# Object Detection and Navigation Assistance for Visually Impaired Individuals
+# =============================================================================
+# This file tells YOLO three things:
+#   1. where the images live       (path + train/val/test)
+#   2. how many classes there are  (implicit from `names`)
+#   3. what each class id means    (names)
+#
+# The class id in every label .txt file is an INDEX INTO `names` BELOW.
+# If you reorder this list after annotating, every existing label becomes wrong.
+# Freeze this list before you start annotating.
+#
+# STATUS: the dataset/ folders do not exist yet. They are created by
+#         scripts/prepare_dataset.py AFTER annotation is complete.
+# =============================================================================
+
+# Root of the dataset, relative to this file.
+path: dataset
+
+# Split folders, relative to `path`. Label folders are found automatically by
+# swapping "images" for "labels" in these paths.
+train: images/train
+val: images/val
+test: images/test
+
+# -----------------------------------------------------------------------------
+# CLASSES
+# -----------------------------------------------------------------------------
+# Chosen for a blind pedestrian on a Dhaka footpath. Design rule: every class
+# must map to an ACTION the navigation layer can speak. Nothing decorative.
+#
+# id : name             what it covers                        why it matters
+# ---------------------------------------------------------------------------
+#  0 : person           pedestrians, standing or walking      collision risk; crowds
+#  1 : pole             electric/utility/sign poles, guy       the single most common
+#                       wires' anchor posts planted mid-       mid-footpath obstacle
+#                       footpath                              in Dhaka
+#  2 : tree             trunks growing through the walkway     head/body collision
+#  3 : stairs           steps up or down, kerb ramps,          fall risk; needs an
+#                       shop entrance steps                    "step up/down" warning
+#  4 : pothole          broken//missing pavement, sunken       trip and ankle injury
+#                       slabs, rubble craters
+#  5 : open_drain       uncovered drains, missing or           the most dangerous
+#                       displaced manhole covers               class - fall hazard
+#  6 : parked_vehicle   rickshaw, CNG auto, motorcycle, car,   blocks the footpath
+#                       van parked on or across the footpath   entirely
+#  7 : street_obstacle  vendor stalls, construction material,  forces a detour
+#                       bricks, sand piles, bins, hanging
+#                       signboards at body height
+#  8 : curb             the footpath edge / kerb line where    boundary between safe
+#                       it drops to the road                   and traffic
+# ---------------------------------------------------------------------------
+
+names:
+  0: person
+  1: pole
+  2: tree
+  3: stairs
+  4: pothole
+  5: open_drain
+  6: parked_vehicle
+  7: street_obstacle
+  8: curb
+
+# -----------------------------------------------------------------------------
+# Bengali labels for the voice/navigation module (NOT used by YOLO training).
+# Kept here so the class list and its Bengali rendering never drift apart.
+# -----------------------------------------------------------------------------
+names_bn:
+  0: মানুষ
+  1: খুঁটি
+  2: গাছ
+  3: সিঁড়ি
+  4: গর্ত
+  5: খোলা ড্রেন
+  6: পার্ক করা গাড়ি
+  7: রাস্তার প্রতিবন্ধকতা
+  8: ফুটপাতের কিনারা
+
+# -----------------------------------------------------------------------------
+# INDOOR CLASSES - contributed at RUNTIME by a second model, not trained here
+# -----------------------------------------------------------------------------
+# The 9 classes above are the THESIS classes: annotated from this project's
+# Dhaka footpath images and trained by scripts/train.py. They are the ones with
+# measured mAP.
+#
+# Indoor navigation additionally needs furniture, and this dataset contains
+# almost no indoor imagery (~2 indoor scenes in a 30-image sample of the
+# unused pool), so those classes cannot honestly be trained from it. Instead
+# backend/detector.py runs a COCO-pretrained model ALONGSIDE the thesis model
+# and takes only these classes from it:
+#
+#     chair, couch, bed, dining table, tv, toilet,
+#     sink, refrigerator, oven, microwave, potted plant, bench
+#
+# State this plainly in the thesis: those indoor classes are COCO-pretrained,
+# carry NO thesis-measured mAP, and are a deployment convenience rather than a
+# research contribution. `door` is deliberately absent - COCO has no door
+# class, so honest support for it needs its own annotated set.
+#
+# The fusion rule is in detector.py: the thesis model always wins an overlap,
+# and the indoor model is excluded from every class the thesis model covers
+# (notably `person`), so the two can never double-report the same object.
+
+indoor_classes_runtime:
+  - chair            # চেয়ার
+  - couch            # সোফা
+  - bed              # বিছানা
+  - dining table     # টেবিল
+  - tv               # টেলিভিশন
+  - toilet           # টয়লেট
+  - sink             # সিংক
+  - refrigerator     # ফ্রিজ
+  - oven             # ওভেন
+  - microwave        # মাইক্রোওয়েভ
+  - potted plant     # গাছের টব
+  - bench            # বেঞ্চ
+
+# -----------------------------------------------------------------------------
+# Provenance - keep this in the thesis methodology chapter.
+# -----------------------------------------------------------------------------
+dataset_provenance:
+  source_folder: image/
+  source_total_files: 21359
+  selected_group: "numeric .jpg filenames at exactly 256x256 (Dhaka footpath scenes)"
+  selected_count: 3000
+  after_near_duplicate_removal: 2787
+  dedup_method: "difference hash (dhash), Hamming distance <= 5, one representative per cluster"
+  excluded_groups:
+    - "12,626 GTSRB German traffic-sign CLASSIFICATION crops (25-128px) - wrong task, wrong region"
+    - "3,355 Indonesian sidewalk images (gambar-*, 608x608) - right domain, different country"
+    - "387 Bangladeshi road frames from a vehicle dashcam - wrong viewpoint for a pedestrian"
+    - "~1,700 assorted scraped/stock images (toothbrushes, banknotes, cats, aircraft, food)"
+  split: "70/20/10 train/val/test, RANDOM_SEED=42, split at near-duplicate-cluster level"

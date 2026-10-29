@@ -1,0 +1,83 @@
+{
+  "model": "yolov8x-worldv2.pt",
+  "device": "0",
+  "conf": 0.08,
+  "iou": 0.5,
+  "imgsz": 640,
+  "prompts": {
+    "person": [
+      "person",
+      "pedestrian walking",
+      "man standing",
+      "woman walking"
+    ],
+    "pole": [
+      "utility pole",
+      "electric pole on footpath",
+      "lamp post",
+      "sign post"
+    ],
+    "tree": [
+      "tree trunk",
+      "tree growing on pavement"
+    ],
+    "stairs": [
+      "stairs",
+      "concrete steps",
+      "staircase entrance"
+    ],
+    "pothole": [
+      "pothole",
+      "broken pavement",
+      "hole in the road surface",
+      "damaged footpath tiles"
+    ],
+    "open_drain": [
+      "open drain",
+      "uncovered drain",
+      "manhole without cover",
+      "open sewer gap in pavement"
+    ],
+    "parked_vehicle": [
+      "parked car",
+      "rickshaw",
+      "auto rickshaw",
+      "parked motorcycle",
+      "parked van",
+      "bicycle parked on footpath"
+    ],
+    "street_obstacle": [
+      "street vendor stall",
+      "pile of bricks",
+      "construction material",
+      "garbage bin",
+      "sand pile on footpath",
+      "signboard on pavement"
+    ],
+    "curb": [
+      "kerb edge of footpath",
+      "raised pavement edge"
+    ]
+  },
+  "images_processed": 2787,
+  "candidate_boxes": 24010,
+  "filtered_out": {
+    "too_large": 1009,
+    "duplicate": 2383,
+    "too_small": 62
+  },
+  "max_area_ratio": 0.55,
+  "per_class": {
+    "person": 8820,
+    "pole": 153,
+    "tree": 606,
+    "stairs": 23,
+    "pothole": 21,
+    "open_drain": 22,
+    "parked_vehicle": 13328,
+    "street_obstacle": 833,
+    "curb": 204
+  },
+  "verified": false,
+  "note": "Machine-generated candidates from an open-vocabulary detector. NOT ground truth. Must pass through scripts/review_labels.py."
+}

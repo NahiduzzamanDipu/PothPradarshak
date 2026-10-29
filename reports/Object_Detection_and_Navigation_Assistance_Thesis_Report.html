@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Object Detection and Navigation Assistance for Visually Impaired Individuals</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@page { size: A4; margin: 25mm 22mm 22mm 28mm; }
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Source Serif 4", "Noto Sans Bengali", Georgia, serif;
+  font-size: 11.5pt; line-height: 1.62; color: #111; margin: 0;
+  text-align: justify; hyphens: auto;
+}
+
+h1,h2,h3,h4 { font-family: "Source Serif 4", Georgia, serif; color: #000; text-align: left; }
+h1.chapter {
+  font-size: 19pt; margin: 0 0 16pt; padding-bottom: 8pt;
+  border-bottom: 2pt solid #000; break-before: page; break-after: avoid;
+}
+h1.chapter .num { display:block; font-size: 10.5pt; letter-spacing: 2.5pt;
+                  text-transform: uppercase; color: #555; margin-bottom: 5pt; }
+h2 { font-size: 13pt; margin: 17pt 0 6pt; break-after: avoid; }
+h3 { font-size: 11.6pt; margin: 13pt 0 4pt; font-style: italic; break-after: avoid; }
+p { margin: 0 0 8pt; }
+ul,ol { margin: 0 0 9pt; padding-left: 17pt; }
+li { margin-bottom: 4pt; }
+p,li { orphans: 2; widows: 2; }
+
+code { font-family: "IBM Plex Mono", monospace; font-size: 9.4pt;
+       background: #f2f3f5; padding: .5pt 3pt; border-radius: 2pt; }
+pre { font-family: "IBM Plex Mono", monospace; font-size: 8.6pt; line-height: 1.45;
+      background: #f8f9fa; border: .5pt solid #dcdfe3; border-left: 2.5pt solid #333;
+      padding: 9pt 11pt; margin: 8pt 0 11pt; white-space: pre; text-align: left;
+      break-inside: avoid; border-radius: 2pt; }
+
+table { width: 100%; border-collapse: collapse; font-size: 9.4pt; margin: 5pt 0 6pt;
+        break-inside: avoid; text-align: left; }
+th { background: #2b2b2b; color: #fff; padding: 5pt 6pt; font-weight: 600;
+     font-size: 9pt; text-align: left; }
+td { padding: 4.5pt 6pt; border-bottom: .5pt solid #dcdfe3; vertical-align: top; }
+tr:nth-child(even) td { background: #fafafa; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.caption { font-size: 9.2pt; color: #333; text-align: center; margin: 3pt 0 13pt;
+           font-style: italic; break-before: avoid; }
+figure { margin: 11pt 0; break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; border: .5pt solid #ccc; }
+figure.wide img { max-width: 78%; }
+figure.narrow img { max-width: 56%; }
+
+.bn { font-family: "Noto Sans Bengali", sans-serif; }
+
+.titlepage { text-align: center; padding-top: 22mm; break-after: page; }
+.titlepage h1 { font-size: 21pt; line-height: 1.3; margin: 0 0 6pt; text-align: center; }
+.titlepage .by { margin-top: 26mm; font-size: 12pt; line-height: 1.9; }
+.titlepage .foot { margin-top: 24mm; font-size: 11.5pt; line-height: 1.8; }
+.rule { width: 62%; margin: 12pt auto; border-top: 1pt solid #000; }
+
+.front { break-after: page; }
+.front h2 { font-size: 15pt; text-align: center; border-bottom: 1pt solid #000;
+            padding-bottom: 6pt; margin-bottom: 13pt; }
+
+.note { background: #fbfaf5; border: .5pt solid #ddd6bf; border-left: 2.5pt solid #a08a3c;
+        padding: 8pt 11pt; margin: 9pt 0; break-inside: avoid; font-size: 10.6pt; }
+.note p:last-child, .gap p:last-child { margin-bottom: 0; }
+.gap { background: #fdf3f3; border: .5pt solid #eccdcd; border-left: 2.5pt solid #b03030;
+       padding: 8pt 11pt; margin: 9pt 0; break-inside: avoid; font-size: 10.6pt; }
+.placeholder { color: #b03030; font-weight: 600; }
+
+.toc { font-size: 10.6pt; }
+.toc div { display: flex; justify-content: space-between; gap: 8pt;
+           padding: 1.6pt 0; border-bottom: .4pt dotted #bbb; }
+.toc .l1 { font-weight: 600; margin-top: 6pt; }
+.toc .l2 { padding-left: 13pt; }
+
+.eq { text-align: center; margin: 9pt 0; font-size: 11pt; }
+.eq .n { float: right; }
+.bad { color: #a02020; font-weight: 600; }
+.good { color: #1a6b2a; font-weight: 600; }
+.mid { color: #9a6000; font-weight: 600; }
+.refs { font-size: 10.2pt; }
+.refs div { margin-bottom: 6pt; padding-left: 26pt; text-indent: -26pt; }
+</style>
+</head>
+<body>
+
+<!-- ==================== TITLE PAGE ==================== -->
+<div class="titlepage">
+  <p style="font-size:12pt;letter-spacing:1pt;margin-bottom:20mm;">
+    DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING (CSE)<br>
+    FACULTY OF SCIENCE &amp; ENGINEERING
+  </p>
+
+  <h1>Object Detection and Navigation Assistance<br>for Visually Impaired Individuals</h1>
+  <div class="rule"></div>
+  <p style="font-size:12pt;font-style:italic;">
+    A Real-Time Assistive System Using YOLO11 and Bilingual Voice Guidance
+  </p>
+
+  <div class="by">
+    <strong>Submitted by</strong><br>
+    MD Nahiduzzaman Dipu<br>
+    ID: 223002150<br>
+    B.Sc. in Computer Science &amp; Engineering (Day)
+  </div>
+
+  <div class="foot">
+    <strong>Supervised by</strong><br>
+    <span class="placeholder">[Supervisor Name — to be supplied]</span><br>
+    <span class="placeholder">[Designation — to be supplied]</span><br>
+    Department of Computer Science &amp; Engineering<br><br>
+    <span class="placeholder">[University Name — to be supplied]</span><br>
+    <span class="placeholder">[Submission Date — to be supplied]</span>
+  </div>
+</div>
+
+<!-- ==================== DECLARATION ==================== -->
+<div class="front">
+  <h2>Declaration</h2>
+  <p>
+    I declare that this thesis, entitled <em>“Object Detection and Navigation Assistance for
+    Visually Impaired Individuals”</em>, is the result of my own work carried out under the
+    supervision of <span class="placeholder">[Supervisor Name]</span>, Department of Computer
+    Science &amp; Engineering. The system described in this report — including the dataset
+    preparation pipeline, the annotation workflow, the trained detection model, the navigation
+    logic, the bilingual voice subsystem and the web interface — was designed, implemented and
+    evaluated by me.
+  </p>
+  <p>
+    Material drawn from other sources is cited in the text and listed in the References. Where
+    existing software libraries and pre-trained models were used, this is stated explicitly in
+    Chapters 3 and 4, and the boundary between those components and my own contribution is
+    identified. All experimental values reported in Chapter 5 were measured on the hardware
+    described in Section 4.1; no result has been estimated or reproduced from other work.
+  </p>
+  <p>
+    This thesis has not been submitted previously, in whole or in part, for any other degree or
+    qualification.
+  </p>
+
+  <div style="margin-top:24mm;">
+    <p>_______________________________</p>
+    <p><strong>MD Nahiduzzaman Dipu</strong><br>ID: 223002150<br>
+    Date: <span class="placeholder">[to be supplied]</span></p>
+  </div>
+</div>
+
+<!-- ==================== APPROVAL ==================== -->
+<div class="front">
+  <h2>Approval / Certification</h2>
+  <p>
+    This is to certify that the thesis entitled <em>“Object Detection and Navigation Assistance
+    for Visually Impaired Individuals”</em>, submitted by <strong>MD Nahiduzzaman Dipu</strong>
+    (ID: 223002150), has been carried out under my supervision. The work is original and, to the
+    best of my knowledge, has not been submitted elsewhere for the award of any degree. It is
+    recommended for acceptance in partial fulfilment of the requirements for the degree of
+    Bachelor of Science in Computer Science &amp; Engineering.
+  </p>
+
+  <table style="margin-top:16mm;font-size:11pt;">
+    <tr>
+      <td style="border:none;padding-top:16mm;width:50%;">
+        _______________________________<br>
+        <strong>Supervisor</strong><br>
+        <span class="placeholder">[Name, Designation]</span><br>
+        Department of CSE
+      </td>
+      <td style="border:none;padding-top:16mm;">
+        _______________________________<br>
+        <strong>Head of the Department</strong><br>
+        <span class="placeholder">[Name]</span><br>
+        Department of CSE
+      </td>
+    </tr>
+    <tr>
+      <td style="border:none;padding-top:20mm;">
+        _______________________________<br>
+        <strong>Internal Examiner</strong><br>
+        <span class="placeholder">[Name]</span>
+      </td>
+      <td style="border:none;padding-top:20mm;">
+        _______________________________<br>
+        <strong>External Examiner</strong><br>
+        <span class="placeholder">[Name]</span>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- ==================== ACKNOWLEDGEMENT ==================== -->
+<div class="front">
+  <h2>Acknowledgement</h2>
+  <p>
+    I am grateful to my supervisor, <span class="placeholder">[Supervisor Name]</span>, for
+    guidance throughout this work, and in particular for the advice to narrow the class list to
+    obstacles that actually change a pedestrian's decision rather than trying to detect
+    everything visible in a street scene. That constraint shaped the design more than any other
+    single decision.
+  </p>
+  <p>
+    I thank the Department of Computer Science &amp; Engineering for access to laboratory
+    facilities, and my classmates for testing the interface and pointing out that the early
+    version spoke far too often to be tolerable in practice — an observation that led directly to
+    the announcement-suppression logic described in Section 3.11.
+  </p>
+  <p>
+    Finally, I thank my family for their support during the data collection and annotation
+    phases, which took considerably longer than I had planned.
+  </p>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<div class="front">
+  <h2>Abstract</h2>
+  <p>
+    Independent mobility remains a persistent difficulty for people with visual impairment,
+    particularly on the footpaths of dense South Asian cities where the walking surface is
+    frequently obstructed by parked vehicles, poles, street vendors and damaged pavement. The
+    white cane detects obstacles only on contact and conveys nothing about what an obstacle is,
+    while camera-based assistive systems reported in the literature are largely trained on
+    Western urban imagery that does not represent this environment.
+  </p>
+  <p>
+    This thesis presents VisionAssist AI, a real-time assistive prototype that detects
+    obstacles from a single monocular camera and converts them into spoken navigation guidance in
+    Bengali and English. A dataset of 2,787 Dhaka footpath images was assembled from an initial
+    pool of 21,359 unlabelled images, de-duplicated by perceptual hashing, and annotated for nine
+    obstacle classes through a machine-assisted workflow in which an open-vocabulary detector
+    proposed candidate boxes for human review. A YOLO11n detector was fine-tuned on the resulting
+    2,782 annotated images for 100 epochs on an NVIDIA RTX 3050 Ti.
+  </p>
+  <p>
+    Detections are converted into guidance by a deterministic pipeline rather than a second
+    learned model: bounding-box geometry yields a horizontal zone (left, centre, right) and an
+    apparent-proximity band, a priority function ranks obstacles, and an event-based
+    announcement policy with a configurable cooldown decides when speech is warranted. Guidance
+    sentences are constructed by a template grammar that handles Bengali subject–object–verb
+    order and animacy-dependent numeral classifiers, and are spoken through a neural
+    text-to-speech voice. The same pipeline serves three input modes: live camera, uploaded
+    image, and uploaded recorded video.
+  </p>
+  <p>
+    On a held-out test split of 276 images the model achieves mAP@0.5 of 0.419 and mAP@0.5:0.95
+    of 0.297, with precision 0.645 and recall 0.404. Performance is strongly class-dependent:
+    <code>person</code> (AP@0.5 = 0.837) and <code>parked_vehicle</code> (0.781) are detected
+    reliably, whereas <code>pothole</code> and <code>open_drain</code> obtain zero recall. The
+    cause is identified as annotation scarcity rather than model capacity — these classes had 17
+    and 12 training instances respectively, because the open-vocabulary annotation aid could not
+    propose candidates for ground-surface defects. End-to-end throughput is 22.9 FPS in live
+    camera mode and 13.7 FPS in video mode.
+  </p>
+  <p>
+    The contribution of this work is threefold: a reproducible machine-assisted annotation
+    pipeline for an unlabelled Bangladeshi footpath corpus; an explainable, non-learned
+    navigation layer whose behaviour can be audited line by line; and an empirical demonstration
+    that open-vocabulary annotation transfers well to common object categories but fails on the
+    ground-surface hazards that matter most for this application. The system is an assistive
+    prototype and is not proposed as a sole navigation aid.
+  </p>
+
+  <p style="margin-top:12pt;"><strong>Keywords:</strong> Object Detection; YOLO11; Computer
+  Vision; Navigation Assistance; Visually Impaired; Deep Learning; Bengali Speech Guidance;
+  Assistive Technology.</p>
+</div>
+
+<!-- ==================== TOC ==================== -->
+<div class="front toc">
+  <h2>Table of Contents</h2>
+  <div class="l1"><span>Declaration</span><span>ii</span></div>
+  <div class="l1"><span>Approval / Certification</span><span>iii</span></div>
+  <div class="l1"><span>Acknowledgement</span><span>iv</span></div>
+  <div class="l1"><span>Abstract</span><span>v</span></div>
+  <div class="l1"><span>List of Figures / Tables / Abbreviations</span><span>vii</span></div>
+
+  <div class="l1"><span>Chapter 1 — Introduction</span><span>1</span></div>
+  <div class="l2"><span>1.1 Background</span><span>1</span></div>
+  <div class="l2"><span>1.2 Problem Statement</span><span>2</span></div>
+  <div class="l2"><span>1.3 Motivation</span><span>2</span></div>
+  <div class="l2"><span>1.4 Research Gap</span><span>3</span></div>
+  <div class="l2"><span>1.5 Aim &nbsp;·&nbsp; 1.6 Objectives &nbsp;·&nbsp; 1.7 Research Questions</span><span>3</span></div>
+  <div class="l2"><span>1.8 Scope &nbsp;·&nbsp; 1.9 Contributions &nbsp;·&nbsp; 1.10 Organization</span><span>4</span></div>
+
+  <div class="l1"><span>Chapter 2 — Literature Review</span><span>6</span></div>
+  <div class="l2"><span>2.1–2.9 Background areas</span><span>6</span></div>
+  <div class="l2"><span>2.10 Comparative Analysis</span><span>10</span></div>
+
+  <div class="l1"><span>Chapter 3 — Methodology</span><span>11</span></div>
+  <div class="l2"><span>3.1–3.3 System overview, architecture, input sources</span><span>11</span></div>
+  <div class="l2"><span>3.4–3.7 Dataset, collection, annotation, preprocessing</span><span>13</span></div>
+  <div class="l2"><span>3.8–3.9 Detection model and training</span><span>16</span></div>
+  <div class="l2"><span>3.10–3.12 Position, navigation, voice</span><span>18</span></div>
+  <div class="l2"><span>3.13–3.15 Video processing, workflow, algorithms</span><span>21</span></div>
+
+  <div class="l1"><span>Chapter 4 — System Implementation</span><span>24</span></div>
+  <div class="l1"><span>Chapter 5 — Experiments and Results</span><span>28</span></div>
+  <div class="l1"><span>Chapter 6 — Discussion</span><span>35</span></div>
+  <div class="l1"><span>Chapter 7 — Conclusion and Future Work</span><span>38</span></div>
+  <div class="l1"><span>References</span><span>40</span></div>
+  <div class="l1"><span>Appendices A–I</span><span>42</span></div>
+
+  <p style="margin-top:10pt;font-size:9.4pt;font-style:italic;">
+    Page numbers are indicative of document order. They should be regenerated after any edit to
+    the source file, since this document is produced by an HTML-to-PDF pipeline rather than a
+    system with automatic cross-referencing.
+  </p>
+</div>
+
+<!-- ==================== LISTS ==================== -->
+<div class="front">
+  <h2>List of Figures</h2>
+  <div class="toc">
+    <div><span>Fig. 3.1 — Overall system architecture</span><span>11</span></div>
+    <div><span>Fig. 3.2 — Data processing and annotation pipeline</span><span>14</span></div>
+    <div><span>Fig. 3.3 — Object detection workflow (dual-model fusion)</span><span>17</span></div>
+    <div><span>Fig. 3.4 — Horizontal zone partitioning</span><span>18</span></div>
+    <div><span>Fig. 3.5 — Navigation decision workflow</span><span>20</span></div>
+    <div><span>Fig. 3.6 — Live camera workflow</span><span>21</span></div>
+    <div><span>Fig. 3.7 — Image processing workflow</span><span>21</span></div>
+    <div><span>Fig. 3.8 — Recorded video workflow</span><span>22</span></div>
+    <div><span>Fig. 3.9 — Voice guidance workflow</span><span>22</span></div>
+    <div><span>Fig. 3.10 — Overall system flowchart</span><span>23</span></div>
+    <div><span>Fig. 5.1 — Training and validation curves</span><span>29</span></div>
+    <div><span>Fig. 5.2 — Normalized confusion matrix</span><span>30</span></div>
+    <div><span>Fig. 5.3 — Precision–recall curve</span><span>31</span></div>
+    <div><span>Fig. 5.4 — F1–confidence curve</span><span>31</span></div>
+    <div><span>Fig. 5.5 — Per-class mAP</span><span>32</span></div>
+    <div><span>Fig. 5.6 — Detection example (indoor)</span><span>32</span></div>
+    <div><span>Fig. 5.7 — Live camera frame with overlay</span><span>33</span></div>
+    <div><span>Fig. 5.8 — Interface, image mode</span><span>33</span></div>
+    <div><span>Fig. 5.9 — Interface, video mode</span><span>34</span></div>
+  </div>
+
+  <h2 style="margin-top:16pt;">List of Tables</h2>
+  <div class="toc">
+    <div><span>Table 2.1 — Comparison with related systems</span><span>10</span></div>
+    <div><span>Table 3.1 — Class list and Bengali labels</span><span>13</span></div>
+    <div><span>Table 3.2 — Dataset reduction pipeline</span><span>14</span></div>
+    <div><span>Table 3.3 — Split sizes and per-class instances</span><span>15</span></div>
+    <div><span>Table 3.4 — Detection model configuration</span><span>16</span></div>
+    <div><span>Table 3.5 — Training configuration</span><span>17</span></div>
+    <div><span>Table 3.6 — Priority score components</span><span>19</span></div>
+    <div><span>Table 4.1 — Hardware and software environment</span><span>24</span></div>
+    <div><span>Table 4.2 — Software modules</span><span>25</span></div>
+    <div><span>Table 5.1 — Overall detection results</span><span>29</span></div>
+    <div><span>Table 5.2 — Per-class performance</span><span>30</span></div>
+    <div><span>Table 5.3 — Measured runtime performance by input mode</span><span>33</span></div>
+    <div><span>Table 5.4 — Bengali and English guidance examples</span><span>34</span></div>
+    <div><span>Table 6.1 — Summary of limitations</span><span>37</span></div>
+  </div>
+
+  <h2 style="margin-top:16pt;">List of Abbreviations</h2>
+  <table>
+    <tr><td style="width:22%"><strong>AP</strong></td><td>Average Precision</td></tr>
+    <tr><td><strong>CNN</strong></td><td>Convolutional Neural Network</td></tr>
+    <tr><td><strong>CUDA</strong></td><td>Compute Unified Device Architecture</td></tr>
+    <tr><td><strong>FPS</strong></td><td>Frames Per Second</td></tr>
+    <tr><td><strong>IoU</strong></td><td>Intersection over Union</td></tr>
+    <tr><td><strong>mAP</strong></td><td>mean Average Precision</td></tr>
+    <tr><td><strong>MJPEG</strong></td><td>Motion JPEG</td></tr>
+    <tr><td><strong>NMS</strong></td><td>Non-Maximum Suppression</td></tr>
+    <tr><td><strong>SOV</strong></td><td>Subject–Object–Verb (word order)</td></tr>
+    <tr><td><strong>TTS</strong></td><td>Text-to-Speech</td></tr>
+    <tr><td><strong>VIP</strong></td><td>Visually Impaired Person</td></tr>
+    <tr><td><strong>YOLO</strong></td><td>You Only Look Once</td></tr>
+  </table>
+</div>
+
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 1</span>Introduction</h1>
+
+<h2>1.1 Background</h2>
+<p>
+Sight supplies most of the information a pedestrian uses to move safely: what lies ahead, how far
+away it is, and whether the surface can be trusted. When that channel is absent, the same
+information must be recovered some other way. The World Health Organization estimates that at
+least 2.2 billion people live with a near or distance vision impairment [1], and mobility is
+consistently among the functions most affected.
+</p>
+<p>
+The white cane remains the dominant aid, and for good reason: it is inexpensive, needs no power,
+and gives immediate tactile feedback. Its limitation is equally clear. It reports contact, not
+category. A cane tells the user that something is there roughly one step before they reach it,
+but not whether that something is a parked motorcycle, a vendor's stall, or the edge of an open
+drain &mdash; distinctions that determine whether the correct response is to step around, stop, or
+retreat.
+</p>
+<p>
+Computer vision offers a way to supply the missing semantic layer. Object detection &mdash; locating
+and classifying multiple objects in a single image &mdash; has become practical in real time since the
+introduction of single-stage detectors. Redmon <em>et al.</em> reframed detection as a single
+regression problem in YOLO [2], removing the separate region-proposal stage used by two-stage
+approaches such as Faster R-CNN [3]. Subsequent work in both families improved accuracy
+substantially [4], [5], [6], and the YOLO line in particular has been refined across many
+generations, with YOLO11 [7] the version used in this work.
+</p>
+<p>
+For an assistive application, detection alone is insufficient. A list of bounding boxes must be
+turned into something a person can act on without seeing the screen, which requires deciding
+which detections matter, expressing their position in egocentric terms, and delivering the result
+as speech. Each of those steps introduces design questions that detection accuracy does not
+answer, and they occupy much of this thesis.
+</p>
+
+<h2>1.2 Problem Statement</h2>
+<p>
+The problem addressed here is the following: <em>given a single monocular camera carried by a
+visually impaired pedestrian, how can obstacles on a Bangladeshi footpath be detected and
+communicated as timely, non-overwhelming spoken guidance in the user's own language?</em>
+</p>
+<p>
+Three sub-problems follow. First, no annotated detection dataset exists for this environment, and
+the classes that matter locally &mdash; rickshaws and other vehicles parked across the walkway, poles
+planted mid-footpath, uncovered drains &mdash; are not the classes for which public datasets provide
+labels. Second, the output must be selective: a detector running at over twenty frames per second
+produces far more detections than can be spoken, so the system must decide when silence is
+correct. Third, the guidance must be delivered in grammatical Bengali, which is not simply a
+matter of substituting words into an English sentence pattern.
+</p>
+
+<h2>1.3 Motivation</h2>
+<p>
+The immediate motivation is environmental. Footpaths in Dhaka are frequently interrupted:
+vehicles park across them, construction material is stored on them, poles and trees stand in the
+middle of them, and drain covers are missing often enough that falling into one is a realistic
+hazard rather than a hypothetical. A system trained on European or North American street imagery
+does not encounter these conditions, and will not have learned the object categories that
+describe them.
+</p>
+<p>
+A second motivation is practical accessibility. Smartphone and laptop cameras are already widely
+available, and a system that runs on commodity hardware without a cloud connection avoids both
+the recurring cost and the latency of remote inference. This matters for an application where a
+delayed warning is equivalent to no warning.
+</p>
+<p>
+A third motivation is methodological, and emerged during the work rather than preceding it.
+Annotating a detection dataset by hand is the step at which student projects of this kind
+commonly stall. Establishing whether an open-vocabulary detector can reduce that burden &mdash; and
+measuring honestly where it cannot &mdash; is useful independently of the assistive application.
+</p>
+
+<h2>1.4 Research Gap</h2>
+<p>
+Camera-based assistive navigation is an established research area, and several deployed and
+prototype systems are reviewed in Chapter 2. The gap addressed here is narrower than "no system
+exists", which would not be an accurate claim.
+</p>
+<p>
+The gap is one of <em>domain and class coverage</em>. Systems reported in the literature typically
+either detect the generic object categories supplied by COCO [8] &mdash; which include
+<code>person</code>, <code>car</code> and <code>chair</code> but not <code>pothole</code>,
+<code>open_drain</code> or the footpath edge &mdash; or rely on proximity sensing that classifies
+nothing. Work specific to South Asian pedestrian infrastructure is comparatively sparse, and the
+ground-surface hazards characteristic of it are correspondingly under-represented in available
+training data.
+</p>
+<p>
+A secondary gap concerns the guidance layer. Papers in this area often describe detection
+performance in detail while treating the conversion from detections to speech as an
+implementation detail. Since that conversion determines whether the system is usable at all, this
+thesis specifies and evaluates it explicitly.
+</p>
+
+<h2>1.5 Aim</h2>
+<p>
+To design, implement and evaluate a real-time assistive system that detects footpath obstacles
+from a monocular camera and delivers prioritised navigation guidance as Bengali or English
+speech, using a detection model trained on locally collected imagery.
+</p>
+
+<h2>1.6 Objectives</h2>
+<ol>
+  <li>To assemble and annotate a detection dataset of Bangladeshi footpath scenes covering
+      obstacle classes relevant to pedestrian navigation.</li>
+  <li>To evaluate whether an open-vocabulary detector can generate usable candidate annotations,
+      and to quantify per class where it succeeds and where it fails.</li>
+  <li>To train a single-stage detector on the annotated dataset and report precision, recall and
+      mean average precision on a held-out test split.</li>
+  <li>To implement a spatial analysis stage that assigns each detection a horizontal zone and an
+      apparent-proximity band from bounding-box geometry.</li>
+  <li>To design an announcement policy that prioritises hazardous obstacles and suppresses
+      repetition, and to specify it in a form that can be inspected and justified.</li>
+  <li>To generate grammatical guidance sentences in Bengali and English and deliver them as
+      speech.</li>
+  <li>To support three input modes &mdash; live camera, uploaded image and uploaded recorded video &mdash;
+      through a single detection pipeline, and to measure runtime performance in each.</li>
+</ol>
+
+<h2>1.7 Research Questions</h2>
+<ol>
+  <li><strong>RQ1.</strong> What detection performance can a nano-scale YOLO11 model achieve on a
+      locally collected footpath dataset of approximately 2,800 annotated images, and how does
+      performance vary across obstacle classes?</li>
+  <li><strong>RQ2.</strong> To what extent can an open-vocabulary detector substitute for manual
+      annotation, and for which object categories does this substitution break down?</li>
+  <li><strong>RQ3.</strong> Can a deterministic, non-learned navigation layer convert detections
+      into guidance that is both prioritised and sufficiently infrequent to be usable?</li>
+  <li><strong>RQ4.</strong> What runtime performance is achievable on a consumer laptop GPU
+      across live camera, image and recorded video input?</li>
+</ol>
+
+<h2>1.8 Scope</h2>
+<p><strong>Within scope.</strong> Monocular RGB input; nine outdoor footpath obstacle classes
+trained on project data; twelve indoor furniture classes supplied by a pre-trained model;
+horizontal position estimation; apparent-proximity estimation from bounding-box area; priority
+ranking and announcement suppression; Bengali and English sentence generation and speech;
+a browser-based interface with three input modes; evaluation on a held-out test split and
+measured runtime performance.</p>
+
+<p><strong>Outside scope.</strong> Metric distance estimation (no depth sensor or depth network is
+used, and the system never states a distance in metres); route planning or GPS navigation; object
+tracking across frames; obstacle detection at night or in rain, since the collected imagery is
+daytime; formal user trials with visually impaired participants, which would require ethical
+approval not sought for this work; and deployment to embedded or mobile hardware.</p>
+
+<div class="note">
+  <p><strong>On the absence of user trials.</strong> This is a genuine limitation and is treated
+  as such throughout. Section 5.12 explains why no navigation-accuracy percentage is reported:
+  measuring whether guidance is <em>correct</em> requires ground-truth judgements from users who
+  rely on it, and no such evaluation was conducted. Reporting a number in its place would be
+  meaningless.</p>
+</div>
+
+<h2>1.9 Contributions</h2>
+<ol>
+  <li>A reproducible pipeline that converts an unlabelled pool of 21,359 mixed-source images into
+      a de-duplicated, annotated detection dataset of 2,782 footpath images, with the selection
+      and de-duplication criteria recorded so the result can be reconstructed.</li>
+  <li>An empirical characterisation of open-vocabulary annotation on this domain: 24,010 candidate
+      boxes generated in 5.6 minutes, with per-class analysis showing reliable transfer for common
+      objects and near-total failure for ground-surface defects (Section 5.2).</li>
+  <li>A trained YOLO11n detector for nine Bangladeshi footpath obstacle classes, with per-class
+      results reported including the classes that fail.</li>
+  <li>An explainable navigation layer &mdash; priority scoring, event-based announcement and cooldown &mdash;
+      specified in full and implemented without any learned component.</li>
+  <li>A bilingual guidance generator that handles Bengali subject&ndash;object&ndash;verb order and
+      animacy-dependent numeral classifiers rather than translating word by word.</li>
+  <li>A single detection pipeline serving three input modes, with measured throughput for each.</li>
+</ol>
+
+<h2>1.10 Organization of the Thesis</h2>
+<p>
+<strong>Chapter 2</strong> reviews assistive technology, object detection and speech guidance, and
+positions this work against comparable systems. <strong>Chapter 3</strong> describes the
+methodology: dataset construction, annotation, model configuration, and the spatial, navigation
+and voice stages, with pseudocode for each algorithm. <strong>Chapter 4</strong> covers
+implementation &mdash; environment, module structure, error handling and optimisation.
+<strong>Chapter 5</strong> reports the experiments: training behaviour, detection metrics,
+per-class results, and runtime measurements for all three input modes.
+<strong>Chapter 6</strong> interprets these findings and states the limitations.
+<strong>Chapter 7</strong> concludes and identifies future work. Appendices contain the class
+list, configuration, algorithms, sample results, interface screenshots and execution
+instructions.
+</p>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 2</span>Literature Review</h1>
+
+<h2>2.1 Assistive Technology for Visually Impaired People</h2>
+<p>
+Assistive mobility devices are commonly divided into electronic travel aids, which detect
+obstacles; electronic orientation aids, which help establish position and route; and position
+locator devices. Surveys of the area [9] observe a recurring trade-off: devices that are simple
+and reliable convey little information, while devices that interpret the scene richly tend to be
+heavier, costlier, or dependent on infrastructure.
+</p>
+<p>
+Early electronic aids used ultrasonic or infrared ranging to signal proximity through vibration or
+tone. These remain useful because they are cheap and work in darkness, but they are fundamentally
+category-blind: a wall and a pedestrian at the same range produce the same signal. The
+motivation for vision-based aids is precisely to add the category information that ranging
+sensors cannot supply.
+</p>
+
+<h2>2.2 Computer Vision-Based Navigation</h2>
+<p>
+Vision-based assistive navigation typically combines a camera, a scene-understanding component,
+and a non-visual output channel. Reported designs differ mainly in where computation occurs and
+what is communicated. Systems that offload inference to a server achieve higher accuracy but
+introduce network dependence and latency, both problematic when a warning must arrive before the
+user's next step. Systems that run on the device accept a smaller model in exchange for
+predictable timing &mdash; the trade-off this thesis makes, for the reasons given in Section 3.8.
+</p>
+<p>
+A recurring design question is how much to say. Describing every detected object produces a
+narration that users cannot follow while walking, and several authors note that reducing output
+is as important as improving detection. This observation motivated the announcement policy in
+Section 3.11.
+</p>
+
+<h2>2.3 Object Detection</h2>
+<p>
+Object detection requires simultaneous localisation and classification. Before deep learning,
+detectors combined hand-designed features with sliding-window classifiers; the Viola&ndash;Jones
+framework [10] is the canonical example, effective for faces but not readily generalised. The
+shift to learned features followed the success of convolutional networks on large-scale
+classification [11].
+</p>
+<p>
+Modern detectors are usually grouped into two families. Two-stage detectors first propose regions
+and then classify them; R-CNN and its successors, culminating in Faster R-CNN [3], established
+this approach and remain competitive in accuracy. One-stage detectors predict boxes and classes
+directly, trading some accuracy for a large gain in speed &mdash; SSD [4] and RetinaNet [5], the latter
+introducing focal loss to address foreground&ndash;background imbalance, are representative. More
+recently, transformer-based detectors such as DETR [12] have removed hand-designed components
+including non-maximum suppression, at the cost of longer training schedules.
+</p>
+
+<h2>2.4 YOLO-Based Object Detection</h2>
+<p>
+YOLO [2] treats detection as a single regression from image pixels to box coordinates and class
+probabilities, evaluated in one forward pass. This design is what makes real-time operation
+attainable, and successive versions have refined it while preserving that property: YOLO9000 [13]
+introduced anchor boxes and joint classification&ndash;detection training, YOLOv3 [14] added multi-scale
+prediction, and YOLOv4 [6] consolidated a range of training and architectural improvements. Recent
+iterations released as engineering frameworks rather than papers, including YOLOv8 and YOLO11 [7],
+provide model scaling from nano to extra-large, allowing the accuracy&ndash;latency operating point to
+be chosen for the target hardware. That scaling property is directly relevant here, and Section
+3.8 explains why the nano variant was selected.
+</p>
+
+<h2>2.5 Deep Learning for Object Detection</h2>
+<p>
+Detection performance depends heavily on the quantity and relevance of labelled data. Public
+benchmarks &mdash; PASCAL VOC [15] and COCO [8] &mdash; provide both training data and standard evaluation
+protocol, and the mAP metric used in Chapter 5 follows the COCO convention of averaging over
+intersection-over-union thresholds from 0.5 to 0.95.
+</p>
+<p>
+For domains not represented in these benchmarks, transfer learning from a pre-trained backbone
+is standard practice and is what this work does: training begins from COCO-pretrained weights and
+fine-tunes on the project dataset. Training from random initialisation on fewer than two thousand
+images would be expected to underfit badly.
+</p>
+<p>
+Open-vocabulary detection is a more recent development directly relevant to the annotation
+problem. YOLO-World [16] combines a YOLO detector with vision&ndash;language embeddings derived from
+CLIP-style training [17], allowing detection of categories specified by text prompts without
+category-specific training data. This capability is used in Section 3.6 to generate candidate
+annotations, and its per-class reliability is measured in Section 5.2.
+</p>
+
+<h2>2.6 Navigation and Spatial Awareness</h2>
+<p>
+Converting detections into spatial guidance requires an egocentric frame. A common and
+computationally trivial approach is to partition the image horizontally and report which region an
+object occupies, which is the method adopted here (Section 3.10).
+</p>
+<p>
+Estimating distance from a single camera is considerably harder. Bounding-box area is only a
+proxy, because apparent size confounds true distance with object size. Monocular depth estimation
+networks such as MiDaS [18] can recover relative depth from a single image, but add inference cost
+and were not integrated here; the interface is designed to accept such a component later
+(Section 7.4). This thesis therefore reports proximity bands rather than distances, and Section
+3.10 states that limitation explicitly.
+</p>
+
+<h2>2.7 Voice-Based Assistance</h2>
+<p>
+Speech is the natural output channel when the visual one is unavailable, but it is serial and
+occupies the user's attention. Two consequences follow. First, message ordering matters: the most
+important obstacle must be spoken first, since the user may act before the sentence finishes.
+Second, message frequency must be controlled, because continuous narration both masks
+environmental sound and becomes fatiguing. These considerations shape the priority and cooldown
+mechanisms described in Section 3.11.
+</p>
+
+<h2>2.8 Bengali Speech Assistance</h2>
+<p>
+Bengali text-to-speech has improved substantially with neural synthesis, and several commercial
+services now provide Bengali voices of usable quality. Generating the text to be spoken, however,
+is a separate problem. Bengali is a subject&ndash;object&ndash;verb language, so a sentence generated by
+substituting Bengali words into an English template produces incorrect word order. Bengali also
+uses numeral classifiers whose form depends on animacy &mdash; <span class="bn">একজন</span> for people,
+<span class="bn">একটি</span> for inanimate objects &mdash; so a generator that ignores animacy produces
+grammatically wrong output. Both properties are handled explicitly in Section 3.12.
+</p>
+
+<h2>2.9 Existing Related Systems</h2>
+<p>
+Reported camera-based assistive systems for visually impaired users generally follow one of three
+patterns. The first uses a pre-trained detector on generic categories and announces what it sees;
+this is straightforward to build and requires no dataset work, but inherits the category
+vocabulary of the pre-training corpus. The second couples a detector with a depth sensor to give
+distance as well as identity, which improves guidance quality at the cost of specialised hardware.
+The third performs scene description on a server, which permits larger models but introduces
+latency and connectivity dependence.
+</p>
+<p>
+This work follows the first pattern architecturally, but replaces the generic category vocabulary
+with classes annotated specifically for the target environment. That substitution is the main
+point of difference, and the results in Chapter 5 show both its benefit for locally relevant
+categories and its cost when annotation coverage is thin.
+</p>
+
+<h2>2.10 Comparative Analysis</h2>
+<p>
+Table 2.1 positions this work against the design patterns described above. The comparison is
+qualitative and deliberately so: published systems are evaluated on different datasets with
+different class lists, so reported mAP figures are not directly comparable, and presenting them
+side by side would imply a rigour the comparison does not have.
+</p>
+
+<table>
+  <tr>
+    <th>Approach</th><th>Detection</th><th>Dataset domain</th>
+    <th>Distance</th><th>Guidance output</th><th>Principal limitation</th>
+  </tr>
+  <tr>
+    <td>Pre-trained generic detector</td>
+    <td>COCO-trained CNN</td><td>Western urban / general</td>
+    <td>None or box-size proxy</td><td>Object names, often English only</td>
+    <td>Cannot name locally relevant hazards absent from COCO</td>
+  </tr>
+  <tr>
+    <td>Detector + depth sensor</td>
+    <td>CNN detector</td><td>Varies</td>
+    <td>Measured</td><td>Object plus distance</td>
+    <td>Requires stereo / ToF hardware; higher cost and power</td>
+  </tr>
+  <tr>
+    <td>Cloud scene description</td>
+    <td>Large server-side model</td><td>Web-scale</td>
+    <td>Usually none</td><td>Rich natural-language description</td>
+    <td>Network dependence and latency; unsuitable for hazard warnings</td>
+  </tr>
+  <tr>
+    <td>Ultrasonic / infrared aid</td>
+    <td>None</td><td>&mdash;</td>
+    <td>Measured (range only)</td><td>Tone or vibration</td>
+    <td>No object category; cannot distinguish hazard types</td>
+  </tr>
+  <tr style="background:#eef2f7;">
+    <td><strong>This work</strong></td>
+    <td>YOLO11n fine-tuned on project data (9 classes) + COCO model for 12 indoor classes</td>
+    <td>Dhaka footpaths, collected for this project</td>
+    <td>None &mdash; apparent-proximity bands only, stated as such</td>
+    <td>Prioritised Bengali / English sentences with announcement suppression</td>
+    <td>Ground-surface hazard classes have too few annotations to be learned (Section 5.5)</td>
+  </tr>
+</table>
+<p class="caption">Table 2.1 &mdash; Comparison of assistive navigation approaches with the present work.</p>
+
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 3</span>Methodology</h1>
+
+<h2>3.1 System Overview</h2>
+<p>
+The system converts a stream of camera frames into occasional spoken sentences. Between those two
+points sit five stages: detection, spatial analysis, priority ranking, announcement decision, and
+sentence generation. Only the first is a learned model. The remaining four are deterministic, and
+Section 3.11 explains why that separation was chosen rather than adopted by default.
+</p>
+<p>
+The design constraint that shaped everything else is that the output channel is serial and slow.
+A detector producing twenty-three frames per second generates on the order of 1,400 detections per
+minute; speech can convey perhaps ten short sentences in the same time. The system is therefore
+better understood as a filter than as a describer, and most of the engineering effort went into
+deciding what <em>not</em> to say.
+</p>
+
+<h2>3.2 Overall Architecture</h2>
+<pre>
+   INPUT LAYER                     PROCESSING CORE                    OUTPUT LAYER
+
+ +---------------+
+ | Live Camera   |--+
+ +---------------+  |          +----------------------+
+ +---------------+  +--------->|    CameraSource      |
+ | Recorded Video|--+          |  (capture thread)    |
+ +---------------+             +----------+-----------+
+                                          | frame
+ +---------------+                        v
+ | Uploaded Image|------------> +----------------------+
+ +---------------+              |  DetectionPipeline   |  (worker thread)
+                                +----------+-----------+
+                                           |
+                          +----------------v-----------------+
+                          |        ObjectDetector            |   LEARNED
+                          |  YOLO11n best.pt  +  COCO model  |
+                          |  fused; thesis model wins ties   |
+                          +----------------+-----------------+
+                                           | detections
+                          +----------------v-----------------+
+                          |        SpatialAnalyzer           |   GEOMETRY
+                          |  LEFT / CENTER / RIGHT           |
+                          |  NEAR / MEDIUM / FAR             |
+                          +----------------+-----------------+
+                                           |
+                          +----------------v-----------------+
+                          |       NavigationEngine           |   RULES
+                          |  priority - event - cooldown     |
+                          +----------------+-----------------+
+                                           | selected objects
+                          +----------------v-----------------+
+                          |      MessageGenerator            |   RULES
+                          |  EN / BN template grammar        |
+                          +----------------+-----------------+
+                                           | sentence
+                          +----------------v-----------------+      +--------------+
+                          |         VoiceEngine              |----->| Audio output |
+                          |  edge-tts (BN) / pyttsx3 (EN)    |      +--------------+
+                          +----------------------------------+
+                                           |
+                     MJPEG video stream + JSON state  ----------->  +--------------+
+                                                                    | Browser UI   |
+                                                                    +--------------+
+</pre>
+<p class="caption">Figure 3.1 &mdash; Overall system architecture. Only the detection stage is a learned
+model; the spatial, navigation and language stages are deterministic.</p>
+
+<h2>3.3 Input Sources</h2>
+<p>
+Three input modes are supported, and they share one detection path. This is an architectural
+decision rather than a convenience: an uploaded video becomes the pipeline's frame
+<em>source</em>, exactly as a webcam does, so video is processed frame by frame as it streams
+rather than analysed in full and replayed afterwards.
+</p>
+<ul>
+  <li><strong>Live camera.</strong> A device index or a network stream URL, opened through OpenCV.
+      The capture layer runs in its own thread and always holds the newest frame.</li>
+  <li><strong>Uploaded image.</strong> A single frame decoded and passed through the same detector,
+      spatial analyser and navigation engine, producing one annotated image and one instruction.</li>
+  <li><strong>Uploaded recorded video.</strong> Assigned as the capture source, played at its
+      native frame rate, with pause, resume and restart control.</li>
+</ul>
+<p>
+Because the three modes share components, a change to the detector or the navigation rules takes
+effect in all of them, and behaviour cannot silently diverge between what is demonstrated on a
+recording and what happens on a live camera.
+</p>
+
+<h2>3.4 Dataset</h2>
+<p>
+The starting point was a pool of 21,359 images collected from several sources and containing
+<strong>no annotations of any kind</strong>. Inspection showed the pool to be heterogeneous: a
+large group of small traffic-sign crops, a group of Indonesian sidewalk photographs, a group of
+Dhaka footpath scenes, dashcam frames recorded by the author, and assorted unrelated images.
+</p>
+<p>
+Only the Dhaka footpath group is in the target domain, and the dataset used for training was
+restricted to it. The selection criterion was recorded so the result is reproducible: purely
+numeric <code>.jpg</code> filenames at exactly 256&times;256 pixels, which isolates that group
+from the others.
+</p>
+
+<table>
+  <tr><th>Stage</th><th class="num">Images</th><th>Operation</th></tr>
+  <tr><td>Initial pool</td><td class="num">21,359</td><td>Mixed sources; no annotations</td></tr>
+  <tr><td>Domain selection</td><td class="num">3,000</td><td>Dhaka footpath group isolated</td></tr>
+  <tr><td>Near-duplicate removal</td><td class="num">2,787</td><td>dHash, Hamming distance &le; 5; 213 removed (7.1%)</td></tr>
+  <tr><td>Human-verified and exported</td><td class="num">2,782</td><td>23,962 bounding boxes</td></tr>
+  <tr><td>Paired and split</td><td class="num">2,763</td><td>19 empty label files excluded</td></tr>
+</table>
+<p class="caption">Table 3.2 &mdash; Dataset reduction from the raw pool to the training set.</p>
+
+<p>
+De-duplication was performed <em>before</em> annotation rather than after, for two reasons: the
+same scene is not annotated twice, and a frame cannot end up in the training split with a
+near-copy of itself in the test split. The second point matters more than the first, since such
+leakage inflates reported accuracy in a way that is difficult to detect afterwards.
+</p>
+
+<table>
+  <tr><th class="num">ID</th><th>Class</th><th>Bengali label</th><th>What it covers</th></tr>
+  <tr><td class="num">0</td><td>person</td><td class="bn">মানুষ</td><td>Pedestrians, standing or walking</td></tr>
+  <tr><td class="num">1</td><td>pole</td><td class="bn">খুঁটি</td><td>Electric, utility and sign poles in the walkway</td></tr>
+  <tr><td class="num">2</td><td>tree</td><td class="bn">গাছ</td><td>Trunks growing through the footpath</td></tr>
+  <tr><td class="num">3</td><td>stairs</td><td class="bn">সিঁড়ি</td><td>Steps up or down, kerb ramps, entrance steps</td></tr>
+  <tr><td class="num">4</td><td>pothole</td><td class="bn">গর্ত</td><td>Broken or missing pavement, sunken slabs</td></tr>
+  <tr><td class="num">5</td><td>open_drain</td><td class="bn">খোলা ড্রেন</td><td>Uncovered drains, missing manhole covers</td></tr>
+  <tr><td class="num">6</td><td>parked_vehicle</td><td class="bn">পার্ক করা গাড়ি</td><td>Rickshaw, CNG, motorcycle, car or van blocking the path</td></tr>
+  <tr><td class="num">7</td><td>street_obstacle</td><td class="bn">রাস্তার প্রতিবন্ধকতা</td><td>Vendor stalls, bricks, sand piles, bins, signboards</td></tr>
+  <tr><td class="num">8</td><td>curb</td><td class="bn">ফুটপাতের কিনারা</td><td>Footpath edge where it drops to the road</td></tr>
+</table>
+<p class="caption">Table 3.1 &mdash; The nine thesis classes. Each class was chosen because it maps to an
+action the navigation layer can express; nothing decorative is included.</p>
+
+<p>
+The class list was fixed before annotation began and not changed afterwards, since the class
+index is embedded in every label file and reordering would silently relabel the entire dataset.
+</p>
+
+<table>
+  <tr><th>Split</th><th class="num">Images</th><th class="num">person</th><th class="num">pole</th><th class="num">tree</th><th class="num">stairs</th><th class="num">pothole</th><th class="num">drain</th><th class="num">vehicle</th><th class="num">obstacle</th><th class="num">curb</th></tr>
+  <tr><td>Train (70%)</td><td class="num">1,934</td><td class="num">6,178</td><td class="num">109</td><td class="num">422</td><td class="num">17</td><td class="num">17</td><td class="num">12</td><td class="num">9,290</td><td class="num">549</td><td class="num">144</td></tr>
+  <tr><td>Validation (20%)</td><td class="num">553</td><td class="num">1,750</td><td class="num">35</td><td class="num">118</td><td class="num">4</td><td class="num">3</td><td class="num">9</td><td class="num">2,652</td><td class="num">183</td><td class="num">35</td></tr>
+  <tr><td>Test (10%)</td><td class="num">276</td><td class="num">878</td><td class="num">9</td><td class="num">65</td><td class="num">2</td><td class="num">1</td><td class="num">1</td><td class="num">1,360</td><td class="num">99</td><td class="num">20</td></tr>
+</table>
+<p class="caption">Table 3.3 &mdash; Split sizes and per-class instance counts. The imbalance visible in the
+hazard columns is analysed in Section 5.5 and is the principal weakness of the dataset.</p>
+
+<div class="gap">
+  <p><strong>Stated plainly, because it determines the results.</strong> The dataset is severely
+  imbalanced. Two classes, <code>person</code> and <code>parked_vehicle</code>, account for
+  roughly 92% of all annotated boxes, while <code>pothole</code>, <code>open_drain</code> and
+  <code>stairs</code> together account for less than 0.3%. Section 3.6 explains how this arose
+  from the annotation method, and Section 5.5 reports its consequence.</p>
+</div>
+
+<h2>3.5 Data Collection</h2>
+<p>
+The footpath images were collected in Dhaka at pedestrian height, framing the walking surface and
+the space immediately ahead. A separate group of road-level frames was recorded by the author from
+a moving vehicle; these were retained in the pool but excluded from the training set, because a
+dashcam viewpoint does not match what a pedestrian's camera sees, and mixing the two would teach
+the model an inconsistent relationship between image position and walking-path relevance.
+</p>
+<p>
+No images of identifiable individuals were collected deliberately as subjects; people appear
+incidentally in public street scenes. The dataset was not published, and Section 6.9 discusses the
+ethical considerations that apply.
+</p>
+
+<h2>3.6 Data Annotation</h2>
+<p>
+Manual annotation of several thousand images is the step at which this project had previously
+stalled, so a machine-assisted workflow was adopted:
+</p>
+<pre>
+ image pool  -->  build_annotation_set.py  -->  autolabel.py  -->  review_labels.py  -->  prepare_dataset.py
+   21,359          select + de-duplicate       candidate boxes      human verifies         train/val/test
+                        2,787 images          (machine, unverified)   and corrects            splits
+</pre>
+<p class="caption">Figure 3.2 &mdash; Data processing and annotation pipeline.</p>
+
+<p>
+Candidate boxes were generated by YOLO-World [16], an open-vocabulary detector that accepts
+natural-language prompts. Each thesis class was described by several prompts rather than a bare
+class name, since descriptive phrases produce markedly better recall from this model &mdash; for
+example <code>pothole</code> was queried as "pothole", "broken pavement", "hole in the road
+surface" and "damaged footpath tiles". Thirty-five prompts were mapped back to the nine classes.
+</p>
+<p>
+Two mechanical failure modes were filtered automatically before any human saw the output. The
+first is whole-image boxes, where the model matches the scene rather than an object; boxes
+covering more than 55% of the frame were discarded. The second is duplicate boxes arising because
+several prompts map to one class and non-maximum suppression runs per prompt, not per class;
+class-wise suppression at 0.65 IoU was applied after the prompt-to-class mapping.
+</p>
+<p>
+A custom review tool was written for the verification stage. It presents each image with its
+candidate boxes and supports accepting, deleting, reclassifying or drawing boxes from the
+keyboard. Images were ordered hardest-first, so that candidates for the hazard classes were
+reviewed before the easy ones.
+</p>
+
+<div class="gap">
+  <p><strong>An honest account of what the verification achieved.</strong> All 2,782 images were
+  reviewed and accepted, but a comparison of the final label files against the machine output
+  shows that the box count was unchanged for every image: no boxes were added, deleted or
+  reclassified. The verification pass therefore confirmed the machine's proposals rather than
+  correcting them.</p>
+  <p>This matters for interpreting Chapter 5. Where YOLO-World proposed nothing &mdash; which is the
+  case for almost all ground-surface hazards &mdash; there was nothing for the reviewer to accept, and
+  those classes consequently remained almost unannotated. The resulting label set is best
+  described as <em>machine-generated with human confirmation</em>, and the zero-recall results in
+  Section 5.5 follow directly from it.</p>
+</div>
+
+<h2>3.7 Data Preprocessing</h2>
+<p>
+Preprocessing is deliberately light, since the images are already small and uniform.
+</p>
+<ul>
+  <li><strong>Resizing.</strong> Images are letterboxed to 640&times;640 by the training framework,
+      preserving aspect ratio.</li>
+  <li><strong>Normalization.</strong> Pixel values are scaled to [0,&nbsp;1]; no dataset-specific
+      mean subtraction is applied.</li>
+  <li><strong>Label format.</strong> YOLO format &mdash; one text file per image, one line per object,
+      <code>class_id cx cy w h</code> with coordinates normalised to [0,&nbsp;1]. Images with no
+      objects keep an empty label file, which YOLO treats as a valid background example.</li>
+  <li><strong>Augmentation.</strong> Mosaic (disabled for the final 10 epochs), horizontal flip
+      with probability 0.5, rotation of &plusmn;5&deg;, and HSV value jitter of 0.4.</li>
+</ul>
+<p>
+The augmentation choices reflect the domain. Rotation is small because a hand-held or
+chest-mounted camera is rarely perfectly level but a footpath scene is never inverted; vertical
+flipping is not used for the same reason. Brightness jitter is comparatively strong because Dhaka
+footpaths alternate between direct sun and deep shade within a single frame.
+</p>
+
+<h2>3.8 Object Detection Model</h2>
+<p>
+The detector is YOLO11n [7], fine-tuned from COCO-pretrained weights. YOLO11 follows the
+established single-stage design: a convolutional backbone extracts multi-scale features, a neck
+aggregates them across scales, and a decoupled anchor-free head predicts class scores and box
+distributions at three output strides. Redundant boxes are removed by non-maximum suppression.
+</p>
+
+<table>
+  <tr><th>Parameter</th><th>Value</th><th>Note</th></tr>
+  <tr><td>Architecture</td><td>YOLO11n (nano)</td><td>Single-stage, anchor-free</td></tr>
+  <tr><td>Parameters</td><td class="num">2,591,595</td><td>Weights file 5.5 MB</td></tr>
+  <tr><td>Input resolution</td><td>640 &times; 640</td><td>Letterboxed</td></tr>
+  <tr><td>Classes</td><td>9</td><td>Table 3.1</td></tr>
+  <tr><td>Confidence threshold</td><td>0.50 default, adjustable 0.10&ndash;0.95</td><td>Runtime setting</td></tr>
+  <tr><td>NMS IoU threshold</td><td>0.45 (inference), 0.60 (evaluation)</td><td></td></tr>
+  <tr><td>Maximum detections</td><td>30 per frame</td><td>Runtime setting</td></tr>
+  <tr><td>Inference device</td><td>CUDA when available, else CPU</td><td>Detected at startup</td></tr>
+</table>
+<p class="caption">Table 3.4 &mdash; Detection model configuration.</p>
+
+<p><strong>Why the nano variant.</strong> The available GPU has 4&nbsp;GB of memory shared with the
+display, and two detection models must run concurrently (below). Measured on this hardware at
+640&nbsp;px, YOLO11n completes a forward pass in 19.0&nbsp;ms. A larger variant would improve
+accuracy but would not leave headroom for the second model, the capture thread and JPEG encoding.
+The results in Chapter 5 also indicate that accuracy here is bounded by annotation coverage
+rather than model capacity, so additional parameters would not address the observed failures.</p>
+
+<p><strong>A second, pre-trained model for indoor classes.</strong> The thesis dataset contains
+essentially no indoor imagery, so indoor furniture classes could not be trained from it. Rather
+than claim a capability the data does not support, a COCO-pretrained YOLO11n runs alongside the
+thesis model and contributes only twelve indoor classes: <code>chair</code>, <code>couch</code>,
+<code>bed</code>, <code>dining table</code>, <code>tv</code>, <code>toilet</code>,
+<code>sink</code>, <code>refrigerator</code>, <code>oven</code>, <code>microwave</code>,
+<code>potted plant</code> and <code>bench</code>.</p>
+
+<pre>
+        frame
+          |
+    +-----+------+
+    |            |
+    v            v
+ thesis       COCO model
+ best.pt      (indoor classes only;
+ (9 classes)   person excluded)
+    |            |
+    |            v
+    |     filter to INDOOR_CLASSES
+    |            |
+    +-----> merge <-----+
+             |
+      IoU > 0.55 with a thesis box ?
+             |
+        yes -+- discard        no -+- keep
+             |
+             v
+      merged detections
+</pre>
+<p class="caption">Figure 3.3 &mdash; Dual-model fusion. The thesis model is authoritative; the indoor
+model contributes only classes the thesis model does not cover.</p>
+
+<p>
+Two rules keep the fusion sound. The indoor model is excluded from every class the thesis model
+covers &mdash; notably <code>person</code>, which both can detect &mdash; so the two cannot double-report one
+object. Where boxes from the two models overlap above 0.55 IoU, the thesis model's box is kept,
+because it is the model trained on this thesis's data. The indoor classes carry no
+thesis-measured mAP and are reported as a deployment feature, not a research result.
+</p>
+
+<h2>3.9 Model Training</h2>
+<table>
+  <tr><th>Setting</th><th>Value</th></tr>
+  <tr><td>Initial weights</td><td><code>yolo11n.pt</code> (COCO-pretrained)</td></tr>
+  <tr><td>Epochs</td><td class="num">100</td></tr>
+  <tr><td>Batch size</td><td class="num">8</td></tr>
+  <tr><td>Image size</td><td class="num">640</td></tr>
+  <tr><td>Optimizer</td><td>auto (SGD selected by the framework)</td></tr>
+  <tr><td>Initial learning rate (lr0)</td><td class="num">0.01</td></tr>
+  <tr><td>Final learning-rate factor (lrf)</td><td class="num">0.01</td></tr>
+  <tr><td>Momentum</td><td class="num">0.937</td></tr>
+  <tr><td>Weight decay</td><td class="num">0.0005</td></tr>
+  <tr><td>Early-stopping patience</td><td class="num">30 epochs</td></tr>
+  <tr><td>Random seed</td><td class="num">42</td></tr>
+  <tr><td>Mixed precision</td><td>Enabled</td></tr>
+  <tr><td>Dataloader workers</td><td class="num">0 (Windows)</td></tr>
+  <tr><td>Device</td><td>CUDA:0 &mdash; NVIDIA RTX 3050 Ti Laptop (4 GB)</td></tr>
+  <tr><td>Wall-clock training time</td><td>13,383 s (3.72 hours)</td></tr>
+</table>
+<p class="caption">Table 3.5 &mdash; Training configuration, as recorded in the run's <code>args.yaml</code>.</p>
+
+<p>
+Batch size 8 was selected empirically as the largest that trained without exhausting GPU memory
+alongside the display. Training completed all 100 epochs; early stopping was not triggered.
+</p>
+
+<h2>3.10 Object Position Estimation</h2>
+<p>
+Each detection is assigned a horizontal zone from the centre of its bounding box.
+</p>
+<div class="eq">
+  center<sub>x</sub> = (x<sub>1</sub> + x<sub>2</sub>) / 2 <span class="n">(3.1)</span>
+</div>
+<div class="eq">
+  frac = center<sub>x</sub> / W<sub>frame</sub> <span class="n">(3.2)</span>
+</div>
+<pre>
+  0%                 33%                66%                100%
+  |------ LEFT -------|----- CENTER -----|------ RIGHT ------|
+        (বামে)             (সামনে)             (ডানে)
+</pre>
+<p class="caption">Figure 3.4 &mdash; Horizontal zone partitioning. Both boundaries are runtime-configurable.</p>
+
+<p>
+An apparent-proximity band is derived from the fraction of the frame the box occupies:
+</p>
+<div class="eq">
+  area_ratio = (w<sub>box</sub> &times; h<sub>box</sub>) / (W<sub>frame</sub> &times; H<sub>frame</sub>)
+  <span class="n">(3.3)</span>
+</div>
+<p>
+with area_ratio &ge; 0.15 classified NEAR, &ge; 0.04 MEDIUM, and otherwise FAR. All four thresholds
+are configurable and are re-read on every frame, so adjusting them in the interface takes effect
+immediately.
+</p>
+
+<div class="gap">
+  <p><strong>This is proximity, not distance, and the distinction is not cosmetic.</strong>
+  Apparent size confounds distance with object size: a bus thirty metres away can occupy more
+  pixels than a chair two metres away. The estimate is therefore comparable between objects of
+  similar real-world size and meaningless across classes.</p>
+  <p>The interface accordingly never displays a distance in metres. An earlier interface mock-up
+  produced during design showed values such as "2.4 meters"; these were removed, because printing
+  a fabricated distance in a device intended for navigation is worse than printing nothing. The
+  spatial module defines a <code>DepthProvider</code> interface so that a monocular depth network
+  such as MiDaS [18] or a stereo sensor can replace the area heuristic without changes elsewhere.</p>
+</div>
+
+<h2>3.11 Navigation Decision System</h2>
+<p>
+The navigation layer contains no learned component. A model that maps detections to instructions
+was considered and rejected: supervising it would require thousands of scene&ndash;instruction pairs
+judged by blind users, which do not exist; its failures would be difficult to enumerate in
+advance, which is unsatisfactory in assistive software; and its decisions could not be justified
+individually during examination. The rules involved are also short enough to state completely,
+which is what the remainder of this section does.
+</p>
+
+<p><strong>Priority.</strong> Every detection receives a score:</p>
+<table>
+  <tr><th>Component</th><th class="num">Contribution</th><th>Rationale</th></tr>
+  <tr><td>Danger class (pothole, open_drain, stairs, curb, pole, vehicle)</td><td class="num">+100</td><td>Fall or collision hazard</td></tr>
+  <tr><td>Indoor obstacle (chair, table, bed, &hellip;)</td><td class="num">+40</td><td>Collision, but not a fall</td></tr>
+  <tr><td>Position is CENTER</td><td class="num">+50</td><td>Directly in the walking path</td></tr>
+  <tr><td>Proximity NEAR / MEDIUM / FAR</td><td class="num">+30 / +12 / 0</td><td>Urgency rises as the object nears</td></tr>
+  <tr><td>Detector confidence</td><td class="num">+10 &times; conf</td><td>Breaks ties without outweighing geometry</td></tr>
+</table>
+<p class="caption">Table 3.6 &mdash; Priority score components.</p>
+<p>
+The weights are chosen so that class and position dominate: a pothole ahead always outranks a
+chair to the left, and no confidence value can reverse that ordering. This is deliberate, since
+confidence reflects the detector's certainty, not the consequence of being wrong.
+</p>
+
+<p><strong>When to speak.</strong> Speech is triggered by change, not presence. An object already
+announced and unchanged is not news, so the engine announces only when one of the following holds:
+a previously unseen object appears; proximity worsens (FAR&nbsp;&rarr;&nbsp;MEDIUM&nbsp;&rarr;&nbsp;NEAR);
+or an object moves into the CENTER zone. Two timers then apply: a per-object cooldown of 3.0&nbsp;s
+and a global minimum gap of 1.2&nbsp;s between any two utterances. A genuine escalation to NEAR
+overrides the per-object cooldown.
+</p>
+
+<div class="note">
+  <p><strong>A detail that took two attempts to get right.</strong> The engine compares an object's
+  current state against its state at the <em>last announcement</em>, not at the previous frame. An
+  earlier implementation compared against the previous frame, with the consequence that an
+  escalation occurring while the cooldown was active was consumed and never spoken. The escalation
+  most likely to be suppressed that way is MEDIUM&nbsp;&rarr;&nbsp;NEAR &mdash; precisely the transition the
+  user most needs to hear.</p>
+</div>
+
+<pre>
+   detections
+        |
+        v
+  filter: confidence >= threshold, not in ignore list,
+          not FAR unless a danger class
+        |
+        v
+  score and sort by priority (Table 3.6)
+        |
+        v
+  is the top object a NEW EVENT ?
+     (new / closer / moved into path)
+        |
+   no --+-- yes
+   |          |
+   v          v
+ stay      cooldown elapsed ?  --- no --> stay silent
+ silent         |                          (unless urgent escalation)
+                yes
+                |
+                v
+        generate sentence -> speak
+</pre>
+<p class="caption">Figure 3.5 &mdash; Navigation decision workflow.</p>
+
+<h2>3.12 Voice Guidance</h2>
+<p>
+Sentences are constructed by a template grammar rather than translated, so that Bengali output is
+generated natively rather than derived from English word order.
+</p>
+<p>
+Two properties of Bengali are handled explicitly. Word order is subject&ndash;object&ndash;verb, so clauses
+are assembled tail-last with the verb <span class="bn">আছে</span> closing the sentence. Numeral
+classifiers depend on animacy: <span class="bn">একজন</span> is used for people and
+<span class="bn">একটি</span> for inanimate objects, and using the latter for a person is
+grammatically incorrect. Animacy is therefore tracked per class rather than assumed.
+</p>
+<p>
+When several objects are reported, they are combined into a single sentence with one closing
+verb rather than read as separate sentences. For a listener who cannot see the scene, one flowing
+sentence is faster to absorb than three restarts of "There is&nbsp;&hellip;", and repeating
+<span class="bn">আছে</span> after every clause is one of the clearest markers of
+machine-generated Bengali.
+</p>
+
+<pre>
+  navigation decision
+        |
+        v
+  select up to N objects (default 3, in priority order)
+        |
+        v
+  language == "bn" ?
+        |
+  yes --+-- no
+   |            |
+   v            v
+ place + prox   article + noun + prox + place
+ + article      joined with ", ... and ..."
+ + noun         prefixed "There is"
+ joined, then
+ close with আছে
+        |
+        v
+  urgent ?  --> prefix সাবধান! / Careful!
+        |
+        v
+  TTS queue (non-blocking) --> audio
+</pre>
+<p class="caption">Figure 3.9 &mdash; Voice guidance workflow.</p>
+
+<p>
+Speech synthesis is selected at runtime according to what the machine can actually do. Windows
+SAPI5 on the development machine has no Bengali voice installed, so the offline engine cannot
+speak Bengali; Bengali therefore uses the <code>edge-tts</code> neural voice
+<code>bn-BD-NabanitaNeural</code>, which requires an internet connection, with the browser Web
+Speech API as a fallback. English uses the offline SAPI5 engine. Synthesis runs in its own thread
+and never blocks detection.
+</p>
+
+<h2>3.13 Recorded Video Processing</h2>
+<p>
+An uploaded video is assigned as the capture source and read frame by frame, with each frame
+passing through the identical detection, spatial, navigation and voice stages used for the live
+camera:
+</p>
+<pre>
+  recorded video file
+        |
+        v
+  read next frame  <-----------------+
+        |                            |
+        v                            |
+  YOLO detection                     |
+        |                            |
+        v                            |
+  position + proximity               |
+        |                            |
+        v                            |
+  navigation decision                |
+        |                            |
+        v                            |
+  voice (if warranted)               |
+        |                            |
+        v                            |
+  draw boxes, encode, stream         |
+        |                            |
+        +-- pause? --- no ------------+
+              |
+             yes -> hold last frame, wait
+</pre>
+<p class="caption">Figure 3.8 &mdash; Recorded video workflow. Frames are processed as they stream, not
+analysed in advance.</p>
+
+<p>
+Playback is paced at the file's own frame rate so that timing on screen corresponds to timing in
+the recording. Repetition is suppressed by the same event-and-cooldown mechanism used for live
+input, so a stationary obstacle occupying many consecutive frames produces one announcement rather
+than one per frame. Pause, resume and restart are implemented in the capture layer and are
+deliberately inoperative for a live camera, which cannot be rewound; the API returns an explanatory
+error rather than silently ignoring the request.
+</p>
+
+<h2>3.14 System Workflow</h2>
+<pre>
+   START
+     |
+     v
+  load configuration; detect CUDA
+     |
+     v
+  discover trained best.pt   --- not found ---> load COCO placeholder
+     |                                          and flag it in log + UI
+     v
+  load thesis model + indoor model
+     |
+     v
+  select input mode  ------------------+------------------+
+     |                                 |                  |
+  live camera                    uploaded image     uploaded video
+     |                                 |                  |
+     v                                 v                  v
+  open capture                    decode frame       open file, pace at native FPS
+     |                                 |                  |
+     +---------------+-----------------+------------------+
+                     |
+                     v
+             +---------------+
+             | frame ready   | <---------------------+
+             +-------+-------+                       |
+                     v                               |
+              detection enabled ? -- no --> stream raw frame
+                     | yes                           |
+                     v                               |
+              YOLO inference (both models, fused)    |
+                     v                               |
+              spatial annotation                     |
+                     v                               |
+              navigation decision                    |
+                     v                               |
+              speak if warranted (async)             |
+                     v                               |
+              draw overlay, encode JPEG              |
+                     v                               |
+              publish frame + JSON state ------------+
+                     |
+                     v
+                 STOP requested ? -- no --> loop
+                     | yes
+                     v
+             release camera, stop voice, END
+</pre>
+<p class="caption">Figure 3.10 &mdash; Overall system flowchart.</p>
+
+<h2>3.15 Algorithms</h2>
+
+<p><strong>Algorithm 1 &mdash; Object detection with dual-model fusion.</strong></p>
+<pre>
+INPUT : frame F, settings S
+OUTPUT: list of detections D
+
+D <- decode(thesis_model.predict(F, conf=S.confidence, iou=S.iou))
+IF S.indoor_enabled AND indoor_model is loaded THEN
+    I <- decode(indoor_model.predict(F, conf=S.indoor_conf))
+    I <- { d in I : class(d) in INDOOR_CLASSES }
+    FOR each d in I DO
+        IF no p in D with IoU(d,p) > 0.55 THEN append d to D
+RETURN D
+</pre>
+
+<p><strong>Algorithm 2 &mdash; Position and proximity classification.</strong></p>
+<pre>
+INPUT : detection d, frame width W, height H
+OUTPUT: position, proximity
+
+cx <- (d.x1 + d.x2) / 2
+frac <- cx / W
+IF   frac < S.zone_left_edge  THEN position <- LEFT
+ELIF frac > S.zone_right_edge THEN position <- RIGHT
+ELSE                                position <- CENTER
+
+area <- ((d.x2-d.x1) * (d.y2-d.y1)) / (W * H)
+IF   area >= S.near_area_ratio   THEN proximity <- NEAR
+ELIF area >= S.medium_area_ratio THEN proximity <- MEDIUM
+ELSE                                  proximity <- FAR
+RETURN position, proximity
+</pre>
+
+<p><strong>Algorithm 3 &mdash; Navigation instruction generation.</strong></p>
+<pre>
+INPUT : detections D, language L
+OUTPUT: sentence, speak_flag
+
+R <- filter(D)                       // confidence, ignore-list, FAR non-hazards
+IF R is empty THEN RETURN clear_path_message(L), FALSE
+
+sort R by priority_score descending  // Table 3.6
+top <- R[0]
+event <- classify_event(top)         // new | closer | moved_into_path | none
+items <- first N of R                // N = max_spoken_objects
+sentence <- combine(items, L)        // one sentence, SOV for Bengali
+RETURN sentence, should_speak(event, top)
+</pre>
+
+<p><strong>Algorithm 4 &mdash; Announcement decision.</strong></p>
+<pre>
+INPUT : event, object o, now t
+OUTPUT: boolean
+
+IF NOT voice_enabled            THEN RETURN FALSE
+IF event is none                THEN RETURN FALSE
+gap <- global_min_gap * (0.4 IF urgent(o) ELSE 1.0)
+IF t - last_any_announcement < gap THEN RETURN FALSE
+IF t - last_announcement[key(o)] < announce_cooldown THEN
+    IF NOT (urgent(o) AND event in {closer, moved_into_path}) THEN RETURN FALSE
+IF sentence == last_sentence AND t - last_any_announcement < cooldown THEN RETURN FALSE
+RETURN TRUE
+</pre>
+
+<p><strong>Algorithm 5 &mdash; Recorded video processing.</strong></p>
+<pre>
+INPUT : video file V
+open capture C on V; read native fps f; total_frames n
+WHILE not stopped DO
+    IF seek_requested THEN C.seek(0); index <- 0
+    IF paused OR finished THEN sleep(50 ms); CONTINUE
+    ok, frame <- C.read()
+    IF NOT ok THEN
+        IF loop THEN C.seek(0); index <- 0; CONTINUE
+        ELSE finished <- TRUE; CONTINUE
+    index <- index + 1
+    D <- Algorithm 1 (frame)
+    annotate each d in D with Algorithm 2
+    sentence, speak <- Algorithm 3 (D, language)
+    IF speak THEN enqueue sentence to voice thread
+    publish annotated frame, D, sentence, progress = index / n
+    sleep(1 / f)                     // pace at the file's own frame rate
+</pre>
+
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 4</span>System Implementation</h1>
+
+<h2>4.1 Development Environment</h2>
+<table>
+  <tr><th>Component</th><th>Specification</th></tr>
+  <tr><td>Operating system</td><td>Microsoft Windows 11 Home (build 26200)</td></tr>
+  <tr><td>CPU</td><td>11th Gen Intel Core i5-11300H @ 3.10 GHz &mdash; 4 cores, 8 threads</td></tr>
+  <tr><td>GPU</td><td>NVIDIA GeForce RTX 3050 Ti Laptop, 4 GB VRAM</td></tr>
+  <tr><td>System memory</td><td>23.7 GB</td></tr>
+  <tr><td>Python</td><td>3.13.14</td></tr>
+  <tr><td>Deep-learning framework</td><td>PyTorch 2.11.0+cu128 (CUDA 12.8 build)</td></tr>
+  <tr><td>Detection framework</td><td>Ultralytics 8.4.84</td></tr>
+  <tr><td>Computer vision</td><td>OpenCV 4.13.0</td></tr>
+  <tr><td>Web framework</td><td>FastAPI with Uvicorn (ASGI)</td></tr>
+  <tr><td>Speech synthesis</td><td>edge-tts (neural, Bengali); pyttsx3 / SAPI5 (English, offline)</td></tr>
+  <tr><td>Annotation model</td><td>YOLOv8x-WorldV2 with OpenAI CLIP text encoder</td></tr>
+</table>
+<p class="caption">Table 4.1 &mdash; Hardware and software environment. All results in Chapter 5 were
+measured on this configuration.</p>
+
+<div class="note">
+  <p><strong>A practical note worth recording.</strong> The default PyTorch wheel installed on this
+  machine was the CPU-only build, so CUDA was unavailable despite the GPU being present and the
+  driver being current. Installing the CUDA build changed annotation throughput from 0.42 to 8.26
+  images per second, a factor of roughly twenty. Verifying that
+  <code>torch.cuda.is_available()</code> returns <code>True</code> is therefore a necessary step
+  rather than an assumption.</p>
+</div>
+
+<h2>4.2 Software Architecture</h2>
+<table>
+  <tr><th>Module</th><th>Responsibility</th></tr>
+  <tr><td><code>backend/camera.py</code></td><td>Threaded frame capture; backend selection; blank-frame detection; video playback control</td></tr>
+  <tr><td><code>backend/detector.py</code></td><td>The only module that calls Ultralytics; inference, dual-model fusion, overlay drawing</td></tr>
+  <tr><td><code>backend/spatial.py</code></td><td>Bounding box &rarr; zone and proximity; <code>DepthProvider</code> extension point</td></tr>
+  <tr><td><code>backend/navigation/</code></td><td>Priority scoring, event classification, cooldown</td></tr>
+  <tr><td><code>backend/voice/</code></td><td>Sentence generation (EN/BN) and non-blocking speech synthesis</td></tr>
+  <tr><td><code>backend/pipeline.py</code></td><td>Worker thread joining the stages; publishes frame and state</td></tr>
+  <tr><td><code>backend/media.py</code></td><td>Single-image analysis reusing the pipeline's components</td></tr>
+  <tr><td><code>backend/config.py</code></td><td>Thread-safe runtime settings; model auto-discovery</td></tr>
+  <tr><td><code>backend/main.py</code></td><td>HTTP API: MJPEG stream, JSON state, control endpoints</td></tr>
+  <tr><td><code>frontend/</code></td><td>Browser interface (HTML, CSS, JavaScript)</td></tr>
+  <tr><td><code>scripts/</code></td><td>Dataset preparation, annotation, training and evaluation tools</td></tr>
+</table>
+<p class="caption">Table 4.2 &mdash; Software modules and their responsibilities.</p>
+<p>
+The modules are separated so that each can be tested independently. The detector knows nothing
+about navigation, and the navigation engine knows nothing about YOLO &mdash; it consumes plain
+dictionaries. This made it possible to change the detection stage (adding the second model)
+without touching the guidance logic.
+</p>
+
+<h2>4.3 Model Loading</h2>
+<p>
+Weights are located by searching a fixed ordered list of paths, so no absolute path is embedded in
+the code and a trained model is picked up automatically after training completes. If no trained
+model is found the system loads the COCO-pretrained network as a placeholder and announces that
+fact in three places &mdash; the log, the video overlay, and a banner across the interface &mdash; so that a
+placeholder run cannot be mistaken for a thesis result. Both models are loaded once at startup and
+reused; a warm-up inference is performed so that the first reported frame rate is honest.
+</p>
+
+<h2>4.4 Camera Module</h2>
+<p>
+Capture runs in a dedicated thread that keeps only the newest frame. This matters because
+<code>VideoCapture.read()</code> blocks: if the inference loop called it directly, a slow model
+would accumulate a backlog of stale frames and the displayed view would drift seconds behind
+reality. Dropping frames is the correct behaviour for a navigation aid, where a fresh frame is
+worth more than a complete sequence.
+</p>
+<p>
+Two failure modes encountered during development are handled explicitly. First, a camera that
+opens successfully may still deliver nothing usable: virtual cameras stream solid black or a
+placeholder graphic when no source is attached. The capture layer therefore samples several frames
+after opening and tests whether they carry any image content, preferring a backend that returns a
+real image and warning in the interface when none does. Second, a device may return black on one
+platform backend while working on another, so DirectShow, Media Foundation and the OpenCV default
+are each attempted in turn.
+</p>
+
+<h2>4.5 Image Upload Module</h2>
+<p>
+An uploaded image is decoded and passed through the pipeline's own detector, spatial analyser and
+navigation engine, so it is judged by exactly the same model and thresholds as the live camera.
+The module does not touch the capture layer, which means an image can be analysed while a live
+session continues. The response contains the annotated image, the per-object table and the
+generated instruction.
+</p>
+
+<h2>4.6 Recorded Video Module</h2>
+<p>
+An uploaded clip is written to disk and assigned as the capture source. Because the capture layer
+already supports file sources, no separate video-processing implementation exists: playback
+control (pause, resume, restart, progress reporting) was added to the capture layer, and
+everything downstream is unchanged. Uploads are limited to 200 MB and older clips are pruned so a
+demonstration session does not fill the disk.
+</p>
+
+<h2>4.7 Object Detection Module</h2>
+<p>
+This is the only module that imports Ultralytics, which confines the framework dependency to one
+file. It converts raw model output into the dictionary structure used throughout the rest of the
+system, performs the dual-model fusion described in Section 3.8, and draws the overlay. Boxes are
+drawn in red with a short label of class name and confidence; position and proximity are shown in
+the side panel rather than on the box, because repeating them on the frame produced labels wide
+enough to overlap in crowded scenes.
+</p>
+
+<h2>4.8 Navigation Module</h2>
+<p>
+The navigation engine holds a small amount of state: for each tracked key &mdash; a
+(class, position) pair rather than a box identity &mdash; it records when the object was last seen and
+what its proximity and position were at the last <em>announcement</em>. Using (class, position) as
+the key is a deliberate simplification: without a tracker the system cannot know whether this is
+the same person as the previous frame, and for guidance purposes "a person on your left" is the
+same information either way.
+</p>
+
+<h2>4.9 Voice Module</h2>
+<p>
+Sentence generation and speech synthesis are separated. The generator is pure text
+transformation and is unit-testable without audio. The synthesiser runs a daemon worker thread
+consuming a bounded queue; when the queue is full the oldest pending phrase is dropped, since a
+stale warning is worse than a missed one. Backend selection is decided at runtime from a
+capability probe rather than assumed, and a synthesis failure never propagates into the detection
+loop.
+</p>
+
+<h2>4.10 User Interface</h2>
+<p>
+The interface is a single browser page served by the backend. The processed video arrives as an
+MJPEG stream, and all other state is polled as JSON four times per second. Bounding boxes are
+drawn into the video frames by OpenCV rather than overlaid in the browser, which guarantees that a
+box can never drift out of alignment with the frame it was computed from.
+</p>
+<p>
+An input-mode selector switches between live camera, image and video, showing only the controls
+relevant to the active mode. Every displayed value &mdash; frame rate, inference time, object count,
+average confidence, model name &mdash; comes from the backend; none is simulated.
+</p>
+
+<h2>4.11 Error Handling</h2>
+<table>
+  <tr><th>Condition</th><th>Behaviour</th></tr>
+  <tr><td>Camera cannot be opened</td><td>Diagnostic listing working device indices; interface shows the reason</td></tr>
+  <tr><td>Camera opens but streams blank frames</td><td>Detected by content test; explicit warning distinguishing camera fault from model fault</td></tr>
+  <tr><td>No trained model present</td><td>COCO placeholder loaded and flagged in log, overlay and interface</td></tr>
+  <tr><td>CUDA unavailable</td><td>Automatic fallback to CPU with a logged warning</td></tr>
+  <tr><td>Speech synthesis fails</td><td>Caught in the voice thread; text still displayed; detection unaffected</td></tr>
+  <tr><td>Unsupported or corrupt upload</td><td>HTTP 415 / 400 with a message naming the accepted formats</td></tr>
+  <tr><td>Video codec unreadable</td><td>Explicit message rather than a stack trace</td></tr>
+  <tr><td>No objects detected</td><td>Reported as an empty state, not an error</td></tr>
+  <tr><td>Training on an unannotated dataset</td><td>Refused before training starts, with an explanation</td></tr>
+</table>
+<p class="caption">Table 4.3 &mdash; Error conditions and system response.</p>
+<p>
+The last row is worth noting: <code>train.py</code> checks that the prepared splits contain
+non-zero bounding boxes and exits if they do not. Training on empty labels completes normally and
+produces a model that detects nothing, which is a failure that is easy to miss.
+</p>
+
+<h2>4.12 Performance Optimization</h2>
+<ul>
+  <li><strong>Single model load.</strong> Both networks are loaded once at startup and reused.</li>
+  <li><strong>Three threads.</strong> Capture, inference and speech run independently, so voice
+      never blocks inference and inference never blocks the HTTP layer.</li>
+  <li><strong>Newest-frame-wins capture.</strong> Stale frames are discarded rather than queued.</li>
+  <li><strong>Optional frame skipping.</strong> Inference can run on one frame in <em>n</em> while
+      the overlay reuses the previous boxes, trading detection latency for display smoothness.</li>
+  <li><strong>Mixed-precision training</strong> to fit the 4 GB memory budget.</li>
+  <li><strong>Adjustable JPEG quality</strong> for the stream, trading bandwidth against latency.</li>
+  <li><strong>Explicit resource release.</strong> Capture handles are released on stop; the audio
+      cache is pruned periodically.</li>
+</ul>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 5</span>Experiments and Results</h1>
+
+<h2>5.1 Experimental Setup</h2>
+<p>
+All experiments were run on the configuration in Table 4.1. Detection metrics were computed on the
+<strong>test split of 276 images</strong>, which was held out from training and from the
+validation set used for early stopping, and which was formed at the near-duplicate cluster level
+so that no test image has a near-copy in training. Evaluation used a confidence threshold of
+0.001 and NMS IoU of 0.60, following the standard convention for mAP computation.
+</p>
+<p>
+Runtime measurements were taken from the running application through its own state endpoint, so
+they reflect end-to-end throughput including capture, inference, overlay drawing and JPEG encoding
+&mdash; not model forward-pass time alone, which is reported separately.
+</p>
+
+<h2>5.2 Dataset Evaluation</h2>
+<p>
+Before training, the annotation stage was evaluated in its own right, since it determines what the
+model can learn. Running YOLO-World over all 2,787 selected images produced <strong>24,010
+candidate boxes in 5.6 minutes</strong> on the GPU (8.26 images per second). The automatic filters
+removed a further 3,454 boxes: 2,383 cross-prompt duplicates, 1,009 whole-image boxes and 62
+boxes too small to be navigationally relevant.
+</p>
+
+<table>
+  <tr><th>Class</th><th class="num">Candidate boxes</th><th class="num">Share</th><th>Transfer quality</th></tr>
+  <tr><td>parked_vehicle</td><td class="num">13,328</td><td class="num">55.5%</td><td>Good</td></tr>
+  <tr><td>person</td><td class="num">8,820</td><td class="num">36.7%</td><td>Good</td></tr>
+  <tr><td>street_obstacle</td><td class="num">833</td><td class="num">3.5%</td><td>Partial</td></tr>
+  <tr><td>tree</td><td class="num">606</td><td class="num">2.5%</td><td>Partial</td></tr>
+  <tr><td>curb</td><td class="num">204</td><td class="num">0.8%</td><td>Poor</td></tr>
+  <tr><td>pole</td><td class="num">153</td><td class="num">0.6%</td><td>Poor</td></tr>
+  <tr><td>stairs</td><td class="num">23</td><td class="num">0.1%</td><td class="bad">Effectively none</td></tr>
+  <tr><td>open_drain</td><td class="num">22</td><td class="num">0.1%</td><td class="bad">Effectively none</td></tr>
+  <tr><td>pothole</td><td class="num">21</td><td class="num">0.1%</td><td class="bad">Effectively none</td></tr>
+</table>
+<p class="caption">Table 5.1 &mdash; Candidate annotations produced by the open-vocabulary detector.</p>
+
+<p>
+This answers <strong>RQ2</strong> directly. Open-vocabulary annotation transferred well to
+categories that resemble its pre-training distribution &mdash; people and vehicles &mdash; and failed almost
+completely on ground-surface defects. The likely explanation is that a pothole has no consistent
+visual prototype: it is defined by the absence of intact surface rather than by a characteristic
+shape, and is easily confused with a shadow, a repair patch or an ordinary paving seam. Whatever
+the mechanism, the practical consequence is that the classes most important for safety received
+almost no candidate annotations, and since the human review confirmed rather than extended the
+machine proposals (Section 3.6), they remained almost unannotated in the final dataset.
+</p>
+
+<h2>5.3 Training Results</h2>
+<p>
+Training ran for the full 100 epochs in 3.72 hours. Both training and validation losses decreased
+throughout, and validation loss did not rise, indicating that the model did not overfit within the
+schedule &mdash; unsurprising given the small model and the augmentation applied.
+</p>
+
+<table>
+  <tr><th class="num">Epoch</th><th class="num">train box</th><th class="num">train cls</th><th class="num">val box</th><th class="num">val cls</th><th class="num">mAP@0.5</th><th class="num">mAP@0.5:0.95</th></tr>
+  <tr><td class="num">1</td><td class="num">1.494</td><td class="num">2.801</td><td class="num">1.296</td><td class="num">1.823</td><td class="num">0.151</td><td class="num">0.092</td></tr>
+  <tr><td class="num">10</td><td class="num">1.325</td><td class="num">1.389</td><td class="num">1.296</td><td class="num">1.292</td><td class="num">0.381</td><td class="num">0.227</td></tr>
+  <tr><td class="num">30</td><td class="num">1.190</td><td class="num">1.126</td><td class="num">1.217</td><td class="num">1.130</td><td class="num">0.395</td><td class="num">0.257</td></tr>
+  <tr><td class="num">50</td><td class="num">1.108</td><td class="num">1.019</td><td class="num">1.068</td><td class="num">1.039</td><td class="num">0.421</td><td class="num">0.297</td></tr>
+  <tr><td class="num">70</td><td class="num">1.038</td><td class="num">0.932</td><td class="num">1.009</td><td class="num">0.990</td><td class="num">0.450</td><td class="num">0.336</td></tr>
+  <tr><td class="num">90</td><td class="num">0.988</td><td class="num">0.864</td><td class="num">0.991</td><td class="num">0.959</td><td class="num">0.439</td><td class="num">0.325</td></tr>
+  <tr><td class="num">100</td><td class="num">0.892</td><td class="num">0.749</td><td class="num">0.986</td><td class="num">0.950</td><td class="num">0.450</td><td class="num">0.341</td></tr>
+</table>
+<p class="caption">Table 5.2 &mdash; Training progression (validation metrics). Best validation
+mAP@0.5:0.95 of 0.345 occurred at epoch 96.</p>
+
+<figure class="wide">
+  <img src="figures/training_curves.png" alt="Training and validation curves">
+  <p class="caption">Figure 5.1 &mdash; Training and validation loss curves with validation metrics over
+  100 epochs.</p>
+</figure>
+
+<p>
+Most of the improvement occurs in the first thirty epochs; the remaining seventy contribute
+roughly 0.05 mAP@0.5. This shape is consistent with a small dataset in which the frequent classes
+are learned quickly and the rare classes never accumulate enough gradient signal to be learned at
+all.
+</p>
+
+<h2>5.4 Confusion Matrix</h2>
+<figure class="wide">
+  <img src="figures/confusion_matrix_normalized.png" alt="Normalized confusion matrix">
+  <p class="caption">Figure 5.2 &mdash; Normalized confusion matrix on the test split. The background
+  row and column capture false alarms and missed detections respectively.</p>
+</figure>
+<p>
+The matrix shows strong diagonal values for <code>person</code> and <code>parked_vehicle</code>.
+The dominant off-diagonal contribution is the background column, indicating that the principal
+error mode is <em>missed detections</em> rather than confusion between classes. For the hazard
+classes the entire row is effectively background, which is the matrix representation of the zero
+recall reported below.
+</p>
+
+<h2>5.5 Per-Class Performance</h2>
+<p>
+Overall results on the held-out test split:
+</p>
+<table>
+  <tr><th>Metric</th><th class="num">Value</th></tr>
+  <tr><td>Precision</td><td class="num">0.645</td></tr>
+  <tr><td>Recall</td><td class="num">0.404</td></tr>
+  <tr><td>F1-score (derived)</td><td class="num">0.497</td></tr>
+  <tr><td>mAP@0.5</td><td class="num">0.419</td></tr>
+  <tr><td>mAP@0.5:0.95</td><td class="num">0.297</td></tr>
+</table>
+<p class="caption">Table 5.3 &mdash; Overall detection results, test split (276 images, 2,435 objects).
+F1 is computed from the reported precision and recall.</p>
+
+<table>
+  <tr><th>Class</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th><th class="num">AP@0.5</th><th class="num">AP@0.5:0.95</th><th class="num">Test instances</th></tr>
+  <tr><td>person</td><td class="num">0.811</td><td class="num">0.749</td><td class="num">0.779</td><td class="num good">0.837</td><td class="num">0.600</td><td class="num">878</td></tr>
+  <tr><td>parked_vehicle</td><td class="num">0.758</td><td class="num">0.688</td><td class="num">0.722</td><td class="num good">0.781</td><td class="num">0.528</td><td class="num">1,360</td></tr>
+  <tr><td>curb</td><td class="num">0.413</td><td class="num">0.450</td><td class="num">0.431</td><td class="num mid">0.359</td><td class="num">0.292</td><td class="num">20</td></tr>
+  <tr><td>street_obstacle</td><td class="num">0.404</td><td class="num">0.267</td><td class="num">0.322</td><td class="num mid">0.295</td><td class="num">0.197</td><td class="num">99</td></tr>
+  <tr><td>pole</td><td class="num">0.263</td><td class="num">0.222</td><td class="num">0.241</td><td class="num mid">0.268</td><td class="num">0.221</td><td class="num">9</td></tr>
+  <tr><td>tree</td><td class="num">0.372</td><td class="num">0.262</td><td class="num">0.307</td><td class="num mid">0.237</td><td class="num">0.138</td><td class="num">65</td></tr>
+  <tr><td>stairs</td><td class="num">0.785</td><td class="num">1.000</td><td class="num">0.879</td><td class="num">0.995 *</td><td class="num">0.697</td><td class="num bad">2</td></tr>
+  <tr><td>pothole</td><td class="num">1.000</td><td class="num bad">0.000</td><td class="num bad">0.000</td><td class="num bad">0.000</td><td class="num">0.000</td><td class="num bad">1</td></tr>
+  <tr><td>open_drain</td><td class="num">1.000</td><td class="num bad">0.000</td><td class="num bad">0.000</td><td class="num bad">0.000</td><td class="num">0.000</td><td class="num bad">1</td></tr>
+</table>
+<p class="caption">Table 5.4 &mdash; Per-class performance on the test split. F1 derived from precision and
+recall. <strong>*</strong> see the interpretation note below.</p>
+
+<div class="gap">
+  <p><strong>Three rows must not be read at face value.</strong></p>
+  <p>The AP@0.5 of 0.995 for <code>stairs</code> is <em>not</em> a strong result. It is computed
+  over two test instances, which is far too few for the number to carry meaning; with two
+  instances, a single detection changes recall by 0.5. The same caution applies to
+  <code>pole</code> (9 instances) and, to a lesser degree, <code>curb</code> (20).</p>
+  <p><code>pothole</code> and <code>open_drain</code> report precision of 1.000 with recall of
+  0.000. This combination indicates that the model made no positive predictions for these classes
+  at all: precision is undefined in that situation and is reported as 1.0 by convention. The
+  correct reading is that <strong>the model detects none of them</strong>.</p>
+  <p>The cause is traced in Section 5.2: with 17 and 12 training instances respectively, there is
+  insufficient signal to learn either class. This is an annotation limitation, not a training or
+  architectural one, and neither longer training nor a larger backbone would be expected to
+  change it.</p>
+</div>
+
+<figure class="wide">
+  <img src="figures/BoxPR_curve.png" alt="Precision-recall curve">
+  <p class="caption">Figure 5.3 &mdash; Precision&ndash;recall curves per class, test split.</p>
+</figure>
+
+<figure class="wide">
+  <img src="figures/BoxF1_curve.png" alt="F1 confidence curve">
+  <p class="caption">Figure 5.4 &mdash; F1 score against confidence threshold. The peak indicates the
+  operating threshold that balances false alarms against missed detections.</p>
+</figure>
+
+<figure class="wide">
+  <img src="figures/per_class_map.png" alt="Per-class mAP chart">
+  <p class="caption">Figure 5.5 &mdash; Per-class AP@0.5 and AP@0.5:0.95.</p>
+</figure>
+
+<h2>5.6 Detection Examples</h2>
+<figure class="narrow">
+  <img src="figures/detect_indoor.jpg" alt="Indoor detection example">
+  <p class="caption">Figure 5.6 &mdash; Detection on an indoor scene, showing the secondary model
+  contributing <code>bed</code> (93%), three <code>chair</code> instances and <code>tv</code>.
+  Vertical lines mark the left/centre/right zone boundaries.</p>
+</figure>
+
+<figure class="narrow">
+  <img src="figures/ui_live_frame.jpg" alt="Live camera frame with overlay">
+  <p class="caption">Figure 5.7 &mdash; A frame from the live camera stream showing the status overlay
+  (frame rate, object count, device, inference time) and zone dividers.</p>
+</figure>
+
+<h2>5.7 Live Camera Testing</h2>
+<p>
+With the trained model and the indoor model both active on the GPU, live camera operation was
+measured at <strong>22.9 FPS end-to-end</strong> with a reported inference time of 42.8 ms at a
+capture resolution of 1280&times;720. Detection, zone assignment, guidance generation and speech
+all functioned in this mode.
+</p>
+<p>
+Two observations from live testing are worth recording because they affected the design. First,
+the confidence threshold matters more than expected: at the default 0.50 the model detected very
+little in practice, and a threshold near 0.30 was needed for useful behaviour &mdash; consistent with
+the modest overall recall in Table 5.3. Second, pointing the camera at an indoor scene produced no
+detections from the thesis model, which is the correct outcome for a model trained exclusively on
+footpaths and was the reason the secondary indoor model was added.
+</p>
+
+<h2>5.8 Image Testing</h2>
+<p>
+Single-image analysis was measured over three consecutive runs on the same 640&times;407 image,
+giving inference times of 82.2 ms, 105.8 ms and 55.5 ms &mdash; the variation reflecting GPU
+scheduling rather than image content. Five objects were detected consistently across all runs,
+with identical classes and positions, confirming that the image path is deterministic.
+</p>
+<p>
+The generated guidance for that image was <span class="bn">"আপনার বাম পাশে খুব কাছে একটি বিছানা
+আছে।"</span> in Bengali and "There is a bed close on your left." in English, correctly selecting
+the single NEAR object over three FAR ones.
+</p>
+
+<h2>5.9 Recorded Video Testing</h2>
+<p>
+A 90-second clip at 6 FPS (540 frames) assembled from dataset imagery was processed in streaming
+mode. Measured throughput was <strong>13.7 FPS</strong> with an inference time of 57.4 ms, lower
+than live mode because both models run while the file is simultaneously decoded.
+</p>
+<p>
+Playback control was verified explicitly: with playback paused, the reported position remained at
+0:13 across a subsequent interval and did not advance; resuming advanced it to 0:17; restart
+returned it to 0:02. Requesting playback control while a live camera was active returned an
+explanatory error rather than silently failing.
+</p>
+<p>
+Over the clip, 39 distinct instructions were generated from 329 detections across 90 analysed
+frames. That ratio is the announcement-suppression mechanism working as intended: without it the
+same stationary obstacle would have produced an utterance on every frame in which it appeared.
+</p>
+
+<figure class="wide">
+  <img src="figures/ui_video_mode.png" alt="Interface in video mode">
+  <p class="caption">Figure 5.9 &mdash; Interface in recorded-video mode, showing the input-mode selector,
+  the streaming annotated frame, the playback bar with progress and controls, and live statistics.</p>
+</figure>
+
+<h2>5.10 Bengali Voice Testing</h2>
+<p>
+Bengali output was verified for word order, classifier agreement and combination behaviour.
+</p>
+<table>
+  <tr><th>Scenario</th><th>Generated Bengali</th><th>Check</th></tr>
+  <tr><td>person, left, medium</td><td class="bn">আপনার বাম পাশে একজন মানুষ আছে।</td><td>Animate classifier <span class="bn">একজন</span></td></tr>
+  <tr><td>rickshaw, right, medium</td><td class="bn">আপনার ডান পাশে একটি রিকশা আছে।</td><td>Inanimate classifier <span class="bn">একটি</span></td></tr>
+  <tr><td>pothole, centre, near</td><td class="bn">সাবধান! সামনে খুব কাছে একটি গর্ত আছে।</td><td>Urgent prefix applied</td></tr>
+  <tr><td>stairs, left, medium</td><td class="bn">আপনার বাম পাশে একটি সিঁড়ি আছে।</td><td>SOV order preserved</td></tr>
+  <tr><td>three objects combined</td><td class="bn">আপনার বাম পাশে একজন মানুষ, সামনে একটি চেয়ার এবং আপনার ডান পাশে একটি রিকশা আছে।</td><td>Single closing <span class="bn">আছে</span></td></tr>
+</table>
+<p class="caption">Table 5.5 &mdash; Bengali guidance examples produced by the system.</p>
+<p>
+Synthesis through the neural Bengali voice was confirmed working end to end: audio files were
+generated server-side and played in the browser, with playback verified to progress rather than
+merely being requested. Because this voice is a network service, Bengali speech is unavailable
+offline on this machine &mdash; a limitation recorded in Section 6.8.
+</p>
+
+<h2>5.11 English Voice Testing</h2>
+<table>
+  <tr><th>Scenario</th><th>Generated English</th></tr>
+  <tr><td>car, right, far</td><td>There is a car in the distance on your right.</td></tr>
+  <tr><td>person, centre, near</td><td>Careful! A person is close ahead.</td></tr>
+  <tr><td>stairs, left, medium</td><td>There are stairs on your left.</td></tr>
+  <tr><td>three objects combined</td><td>There is a person on your left, a chair ahead and a rickshaw on your right.</td></tr>
+</table>
+<p class="caption">Table 5.6 &mdash; English guidance examples.</p>
+<p>
+The <code>stairs</code> case exercises plural-only noun handling: "There are stairs" rather than
+"There is a stairs". English synthesis is offline through the system speech engine and had no
+observed latency issue.
+</p>
+
+<h2>5.12 Navigation Accuracy</h2>
+<div class="gap">
+  <p><strong>No navigation-accuracy figure is reported, and none should be inferred.</strong></p>
+  <p>Evaluating whether guidance is <em>correct</em> requires ground truth about what a user should
+  have been told in each situation. Constructing that ground truth means having visually impaired
+  participants use the system and judge whether each instruction was appropriate, timely and
+  sufficient &mdash; a study requiring ethical approval and participant recruitment that were outside
+  the scope of this work.</p>
+  <p>What can be stated is narrower and verifiable: the zone assignment follows deterministically
+  from Equations (3.1)&ndash;(3.2) and was confirmed correct on inspected examples; the priority
+  ordering follows Table 3.6 and was observed to select the NEAR centre object over FAR peripheral
+  ones; and announcement suppression reduced 329 detections to 39 utterances on the test clip. The
+  <em>usefulness</em> of that behaviour to a blind pedestrian remains unmeasured.</p>
+</div>
+
+<h2>5.13 Performance Analysis</h2>
+<table>
+  <tr><th>Mode</th><th class="num">Throughput</th><th class="num">Inference</th><th>Notes</th></tr>
+  <tr><td>Live camera</td><td class="num">22.9 FPS</td><td class="num">42.8 ms</td><td>1280&times;720, both models active</td></tr>
+  <tr><td>Recorded video</td><td class="num">13.7 FPS</td><td class="num">57.4 ms</td><td>Concurrent file decode</td></tr>
+  <tr><td>Single image</td><td>&mdash;</td><td class="num">55.5&ndash;105.8 ms</td><td>Three runs, same image</td></tr>
+  <tr><td>Model forward pass alone</td><td class="num">52.6 FPS</td><td class="num">19.0 ms</td><td>Thesis model, 640&times;640, GPU</td></tr>
+</table>
+<p class="caption">Table 5.7 &mdash; Measured runtime performance by input mode.</p>
+
+<p>
+The gap between 19.0 ms for the model alone and 42.8 ms end-to-end is accounted for by the second
+model, overlay drawing, JPEG encoding and frame transport. This answers <strong>RQ4</strong>:
+real-time operation is achievable on consumer laptop hardware, with headroom remaining.
+</p>
+
+<p><strong>Error characteristics observed.</strong> The confusion matrix indicates that missed
+detections dominate over class confusion, consistent with recall (0.404) being substantially lower
+than precision (0.645). In practical terms the system is conservative: when it reports an object
+it is usually right, but it fails to report many objects that are present. For an assistive
+device this is the less dangerous of the two error directions, though it is not harmless &mdash; a
+missed pothole is precisely the failure the system exists to prevent.</p>
+
+<p><strong>Small objects and occlusion.</strong> The weaker classes (<code>pole</code>,
+<code>tree</code>, <code>street_obstacle</code>) are those that most often appear partially
+occluded or at the frame edge in crowded footpath scenes. The 256&times;256 source resolution of
+the training images also limits the detail available for small or distant objects.</p>
+
+<p><strong>Lighting.</strong> All training imagery is daytime. Behaviour under artificial or low
+light is untested and should not be assumed.</p>
+
+<h2>5.14 Result Discussion</h2>
+<p>
+The headline figure &mdash; mAP@0.5 of 0.419 &mdash; understates performance on the classes the model
+actually learned and overstates it on those it did not, because mAP averages uniformly over
+classes regardless of how many instances support each one. Read per class, the picture is
+clearer: two classes with thousands of examples reach AP@0.5 of 0.837 and 0.781, four classes with
+tens to hundreds of examples reach 0.24&ndash;0.36, and three classes with fewer than twenty examples
+are either unmeasurable or fail entirely.
+</p>
+<p>
+The relationship between instance count and per-class AP is close to monotonic across the nine
+classes, which supports the interpretation that annotation coverage, rather than model capacity or
+training length, is the binding constraint. This is a useful negative result: it indicates that
+the productive next step is annotation of the hazard classes rather than a larger model or a
+longer schedule.
+</p>
+<p>
+Set against the objectives in Section 1.6, objectives 1, 3, 4, 5, 6 and 7 were met, and objective
+2 was met in the sense that open-vocabulary annotation was evaluated &mdash; with the answer being
+partly negative. The system as built detects people and vehicles reliably and communicates them
+appropriately, but does not yet detect the fall hazards that motivated the class list.
+</p>
+
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 6</span>Discussion</h1>
+
+<h2>6.1 Major Findings</h2>
+<p>
+Three findings emerge from the work, and they are of unequal importance.
+</p>
+<p>
+The first is that a nano-scale detector fine-tuned on roughly nineteen hundred locally collected
+images is sufficient for the common obstacles on a Dhaka footpath. AP@0.5 of 0.837 for
+<code>person</code> and 0.781 for <code>parked_vehicle</code> is adequate for the guidance task,
+which does not require precise box regression &mdash; only a reliable class and an approximately
+correct horizontal position.
+</p>
+<p>
+The second, and the more consequential, is that the annotation method determined the outcome more
+than any modelling decision. Open-vocabulary annotation was fast and effective for categories
+resembling its pre-training data, and produced essentially nothing for ground-surface hazards.
+Because the human review confirmed the machine's proposals rather than supplementing them, that
+gap propagated unchanged into the training set and then into the results.
+</p>
+<p>
+The third is that the guidance layer did not need to be learned. Priority ordering, event
+detection and cooldown were sufficient to convert a dense detection stream into occasional
+sentences, and being deterministic they can be inspected, justified and adjusted without
+retraining.
+</p>
+
+<h2>6.2 Effectiveness of Object Detection</h2>
+<p>
+Detection effectiveness splits cleanly along instance count. Where the dataset provided thousands
+of examples the model performs well; where it provided tens it performs poorly; where it provided
+fewer than twenty it does not perform at all. The near-monotonic relationship between per-class
+instance count and AP (Table 5.4) is the clearest single result in this thesis.
+</p>
+<p>
+Precision exceeding recall by a wide margin (0.645 against 0.404) indicates a conservative
+detector. For an assistive device the direction is preferable to the alternative: spurious
+warnings would erode trust quickly, and a user who is told about an obstacle can generally verify
+it with a cane. It does not, however, make missed detections acceptable, and the missed detections
+are concentrated in exactly the classes where a miss is most costly.
+</p>
+
+<h2>6.3 Navigation Assistance Performance</h2>
+<p>
+The navigation layer behaved as specified. The priority function consistently selected a near,
+centred object over peripheral or distant ones, and the ordering was traceable to Table 3.6 in
+every case examined. Combining several objects into one sentence rather than several worked well
+in testing and reduced the time to convey a scene.
+</p>
+<p>
+The layer's quality is bounded by its input. Priority ranking cannot elevate an obstacle the
+detector never reported, so the hazard-class failures in Chapter 5 propagate directly into
+guidance: the system will not warn about a pothole, regardless of how correctly the priority rules
+are specified. This is worth stating plainly, because the navigation logic being correct might
+otherwise be mistaken for the system being safe.
+</p>
+
+<h2>6.4 Voice Guidance</h2>
+<p>
+Bengali generation handled the two grammatical features it was designed for &mdash; verb-final word
+order and animacy-dependent classifiers &mdash; correctly in all tested cases. Combining clauses under a
+single closing <span class="bn">আছে</span> produces noticeably more natural output than repeating
+the verb, which was the behaviour of the first implementation.
+</p>
+<p>
+The dependence on a network service for Bengali speech is the main practical weakness. English
+synthesis is offline and instantaneous, but Bengali &mdash; the default and more important language for
+the intended users &mdash; requires connectivity. Installing a Bengali system speech voice would remove
+this dependence without any code change, since backend selection is made from a runtime capability
+probe.
+</p>
+
+<h2>6.5 Real-Time Performance</h2>
+<p>
+At 22.9 FPS end-to-end in live mode the system is comfortably real-time for walking pace, and the
+19.0 ms model forward pass indicates substantial remaining headroom. Running two detectors
+concurrently within a 4 GB memory budget was feasible because both are nano-scale.
+</p>
+<p>
+The relevant latency for an assistive device is not frame rate but the interval between a hazard
+entering view and the user hearing about it. That interval includes speech synthesis and playback,
+which for the network-based Bengali voice adds a delay not captured in the frame-rate figures. It
+was not measured, and Section 7.4 identifies it as necessary future work.
+</p>
+
+<h2>6.6 Recorded Video Performance</h2>
+<p>
+Video mode reached 13.7 FPS, lower than live mode because file decoding competes with inference.
+Since the design goal was streaming processing rather than maximum throughput &mdash; frames are
+processed and displayed as they are read, not analysed in advance &mdash; this is acceptable.
+</p>
+<p>
+Reusing the capture layer for video rather than writing a separate video path proved valuable
+beyond saving effort: detection, navigation, voice and statistics behave identically across modes,
+so a demonstration on a recording is a faithful representation of live behaviour rather than a
+separate code path that might diverge.
+</p>
+
+<h2>6.7 Strengths</h2>
+<ul>
+  <li>Detection classes chosen for the target environment rather than inherited from a general
+      benchmark, so the vocabulary includes obstacles that matter locally.</li>
+  <li>A reproducible dataset pipeline with recorded selection criteria, de-duplication before
+      annotation, and split-level leakage prevention.</li>
+  <li>An explainable guidance layer that can be audited and adjusted without retraining.</li>
+  <li>Bengali generated natively rather than translated, with grammatical features handled
+      explicitly.</li>
+  <li>Real-time operation on commodity hardware with no cloud inference.</li>
+  <li>One detection pipeline serving three input modes, preventing behavioural divergence.</li>
+  <li>Honest reporting of failure: the interface never displays a fabricated distance, and the
+      system announces loudly when it is running a placeholder model.</li>
+</ul>
+
+<h2>6.8 Limitations</h2>
+<table>
+  <tr><th>Limitation</th><th>Consequence</th><th>Addressable by</th></tr>
+  <tr><td>Fall hazards not detected (<code>pothole</code>, <code>open_drain</code> zero recall)</td>
+      <td class="bad">The system does not warn about the hazards that motivated it</td>
+      <td>Manual annotation of 100&ndash;200 instances per class</td></tr>
+  <tr><td>Severe class imbalance (92% of boxes in two classes)</td>
+      <td>Rare classes contribute almost nothing to training</td>
+      <td>Targeted annotation; class-balanced sampling or loss weighting</td></tr>
+  <tr><td>No metric distance</td>
+      <td>Guidance says "close" and "far", never a distance</td>
+      <td>Monocular depth network or stereo sensor via <code>DepthProvider</code></td></tr>
+  <tr><td>Bengali speech requires internet</td>
+      <td>Default language unavailable offline on this machine</td>
+      <td>Installing a Bengali system speech voice</td></tr>
+  <tr><td>No object tracking</td>
+      <td>Two people on the left are one item of news; objects not followed across frames</td>
+      <td>Adding a tracker (e.g. ByteTrack) keyed to detection identity</td></tr>
+  <tr><td>Daytime imagery only</td>
+      <td>Night and adverse-weather behaviour unknown</td>
+      <td>Collection under varied conditions</td></tr>
+  <tr><td>Low source resolution (256&times;256)</td>
+      <td>Limits detail for small and distant objects</td>
+      <td>Re-collection at higher resolution</td></tr>
+  <tr><td>Single monocular camera</td>
+      <td>No depth, no motion estimate, no orientation</td>
+      <td>Sensor fusion with IMU or depth</td></tr>
+  <tr><td>No user evaluation</td>
+      <td>Usefulness of the guidance is unmeasured</td>
+      <td>Study with visually impaired participants under ethical approval</td></tr>
+  <tr><td>Verification confirmed rather than corrected labels</td>
+      <td>Annotation errors from the machine stage persist in the dataset</td>
+      <td>A second review pass with correction as the explicit task</td></tr>
+</table>
+<p class="caption">Table 6.1 &mdash; Summary of limitations and how each might be addressed.</p>
+
+<h2>6.9 Ethical and Safety Considerations</h2>
+<p>
+This system is a research prototype. It has not been validated with visually impaired users, has
+known and substantial detection failures, and must not be treated as a sole navigation aid. Any
+deployment would need to position it as supplementary to a cane or guide dog, never as a
+replacement.
+</p>
+<p>
+The most serious ethical risk is not that the system fails, but that it fails <em>selectively</em>
+in a way a user cannot perceive. A user who hears reliable warnings about people and vehicles may
+reasonably infer that silence means a clear path, when in fact the system is structurally
+incapable of reporting an open drain. That asymmetry between apparent and actual competence is
+more dangerous than uniformly poor performance would be, and it is the reason the zero-recall
+results are stated so prominently in this thesis rather than being averaged into an overall
+figure.
+</p>
+<p>
+Two further considerations apply. The dataset consists of public street scenes in which people
+appear incidentally; no individual was recruited or photographed as a subject, and the dataset has
+not been published. Bengali speech synthesis transmits the generated sentence to a third-party
+service, which is a privacy consideration if the system were deployed &mdash; the sentences describe the
+user's immediate surroundings. An offline voice would remove this exposure.
+</p>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<h1 class="chapter"><span class="num">Chapter 7</span>Conclusion and Future Work</h1>
+
+<h2>7.1 Conclusion</h2>
+<p>
+This thesis set out to build an assistive system that detects footpath obstacles from a monocular
+camera and communicates them as spoken guidance in Bengali and English, using a detector trained
+on locally collected imagery rather than a general-purpose benchmark.
+</p>
+<p>
+The system was built and works. A dataset of 2,782 annotated Dhaka footpath images was assembled
+from an unlabelled pool of 21,359 through a documented selection, de-duplication and
+machine-assisted annotation pipeline. A YOLO11n detector fine-tuned on it achieves mAP@0.5 of
+0.419 and mAP@0.5:0.95 of 0.297 on a held-out test split, with AP@0.5 of 0.837 for
+<code>person</code> and 0.781 for <code>parked_vehicle</code>. Detections are converted into
+guidance by a deterministic layer &mdash; zone assignment, priority scoring, event-based announcement
+and cooldown &mdash; and rendered as grammatical Bengali or English speech. The same pipeline serves
+live camera, uploaded image and recorded video input at 22.9 and 13.7 FPS respectively.
+</p>
+<p>
+The system does not, however, do the thing that most motivated it. <code>pothole</code> and
+<code>open_drain</code> obtain zero recall, because the annotation method that made the dataset
+feasible could not propose candidates for ground-surface defects, leaving 17 and 12 training
+instances respectively. The result is a working assistive prototype that is reliable on people and
+vehicles and blind to the fall hazards it was designed to warn about. Establishing that
+limitation clearly, and tracing it to a specific and correctable cause, is a legitimate outcome
+of the work &mdash; but it is a limitation, not a success.
+</p>
+
+<h2>7.2 Research Contributions</h2>
+<ol>
+  <li>A documented, reproducible pipeline converting an unlabelled mixed-source pool into an
+      annotated, de-duplicated footpath detection dataset, with leakage prevented at the split
+      level.</li>
+  <li>An empirical characterisation of open-vocabulary annotation on Bangladeshi footpath imagery,
+      with per-class evidence of where it transfers and where it fails &mdash; a result that is useful
+      to anyone attempting a similar dataset.</li>
+  <li>A trained nine-class detector for this domain, with per-class results reported including
+      the classes that fail.</li>
+  <li>A fully specified, non-learned navigation layer whose behaviour can be audited line by line,
+      including an event-comparison detail (compare against last announcement, not last frame)
+      that a naive implementation gets wrong.</li>
+  <li>A bilingual guidance generator handling Bengali verb-final order and animacy-dependent
+      classifiers.</li>
+  <li>A single detection pipeline serving three input modes with measured performance for each.</li>
+</ol>
+
+<h2>7.3 Limitations</h2>
+<p>
+The limitations are set out in Table 6.1. The three that most constrain the current system are the
+absence of hazard-class detection, the absence of metric distance estimation, and the absence of
+any evaluation with visually impaired users. The first is a data problem with a clear remedy; the
+second requires an additional sensing or modelling component; the third requires a study design
+and ethical approval rather than engineering.
+</p>
+
+<h2>7.4 Future Work</h2>
+<p><strong>Immediate, and necessary before any claim of hazard detection.</strong></p>
+<ul>
+  <li>Manually annotate 100&ndash;200 instances each of <code>pothole</code>, <code>open_drain</code>,
+      <code>stairs</code> and <code>curb</code>. The unused image pool already contains a large
+      number of pothole and stairs photographs, so the images exist; only the boxes are missing.</li>
+  <li>Retrain and re-evaluate, reporting per-class AP for the hazard classes specifically.</li>
+  <li>Apply class-balanced sampling or loss weighting so that rare classes contribute
+      proportionally more gradient signal.</li>
+</ul>
+
+<p><strong>System capability.</strong></p>
+<ul>
+  <li>Integrate monocular depth estimation [18] through the existing <code>DepthProvider</code>
+      interface, replacing apparent-size proximity with relative depth and allowing the system to
+      speak in distance terms without fabricating them.</li>
+  <li>Add object tracking so that guidance can refer to a specific object across frames and
+      describe motion (approaching, receding) rather than only presence.</li>
+  <li>Measure hazard-to-speech latency end to end, which is the metric that actually matters for
+      the user and which frame rate does not capture.</li>
+</ul>
+
+<p><strong>Data and deployment.</strong></p>
+<ul>
+  <li>Extend collection to night, rain and artificial lighting, and to higher source resolution.</li>
+  <li>Export to ONNX or NCNN for smartphone deployment, which is the realistic form factor for a
+      pedestrian aid; the current laptop implementation is a development platform, not a product.</li>
+  <li>Install or train an offline Bengali speech voice to remove the network dependence.</li>
+</ul>
+
+<p><strong>Evaluation.</strong></p>
+<ul>
+  <li>Conduct a user study with visually impaired participants under appropriate ethical approval,
+      measuring whether instructions are judged timely, correct and sufficient. Without this, the
+      navigation layer's usefulness remains asserted rather than demonstrated.</li>
+</ul>
+
+<div class="note">
+  <p><strong>Implemented in this work:</strong> nine-class footpath detection; twelve indoor classes
+  via a pre-trained model; zone and proximity estimation; priority ranking; event-based
+  announcement with cooldown; Bengali and English generation and speech; live camera, image and
+  recorded video modes; browser interface.</p>
+  <p><strong>Not implemented, and listed above as future work:</strong> hazard-class detection;
+  depth estimation; object tracking; GPS or IMU integration; mobile deployment; offline Bengali
+  speech; user evaluation.</p>
+</div>
+
+<!-- ==================== REFERENCES ==================== -->
+<h1 class="chapter"><span class="num">References</span>&nbsp;</h1>
+
+<div class="note">
+  <p><strong>Verification note.</strong> The references below are standard, widely cited works in
+  computer vision and assistive technology, cited for the specific claims attributed to them.
+  Bibliographic details should be checked against the publisher's record before submission, and
+  page numbers and DOIs added where the department's style requires them; they have been omitted
+  here rather than reproduced from memory.</p>
+</div>
+
+<div class="refs">
+<div>[1] World Health Organization, <em>World Report on Vision</em>. Geneva, Switzerland: World Health Organization, 2019.</div>
+
+<div>[2] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, "You Only Look Once: Unified, Real-Time Object Detection," in <em>Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2016.</div>
+
+<div>[3] S. Ren, K. He, R. Girshick, and J. Sun, "Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks," in <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, 2015.</div>
+
+<div>[4] W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, "SSD: Single Shot MultiBox Detector," in <em>Proc. European Conf. Computer Vision (ECCV)</em>, 2016.</div>
+
+<div>[5] T.-Y. Lin, P. Goyal, R. Girshick, K. He, and P. Dollár, "Focal Loss for Dense Object Detection," in <em>Proc. IEEE Int. Conf. Computer Vision (ICCV)</em>, 2017.</div>
+
+<div>[6] A. Bochkovskiy, C.-Y. Wang, and H.-Y. M. Liao, "YOLOv4: Optimal Speed and Accuracy of Object Detection," <em>arXiv preprint</em> arXiv:2004.10934, 2020.</div>
+
+<div>[7] G. Jocher and J. Qiu, "Ultralytics YOLO11," Ultralytics, 2024. [Software]. Available: https://github.com/ultralytics/ultralytics</div>
+
+<div>[8] T.-Y. Lin, M. Maire, S. Belongie, J. Hays, P. Perona, D. Ramanan, P. Dollár, and C. L. Zitnick, "Microsoft COCO: Common Objects in Context," in <em>Proc. European Conf. Computer Vision (ECCV)</em>, 2014.</div>
+
+<div>[9] R. Tapu, B. Mocanu, and T. Zaharia, "Wearable Assistive Devices for Visually Impaired: A State of the Art Survey," <em>Pattern Recognition Letters</em>, vol. 137, pp. 37&ndash;52, 2020.</div>
+
+<div>[10] P. Viola and M. Jones, "Rapid Object Detection Using a Boosted Cascade of Simple Features," in <em>Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2001.</div>
+
+<div>[11] A. Krizhevsky, I. Sutskever, and G. E. Hinton, "ImageNet Classification with Deep Convolutional Neural Networks," in <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, 2012.</div>
+
+<div>[12] N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, and S. Zagoruyko, "End-to-End Object Detection with Transformers," in <em>Proc. European Conf. Computer Vision (ECCV)</em>, 2020.</div>
+
+<div>[13] J. Redmon and A. Farhadi, "YOLO9000: Better, Faster, Stronger," in <em>Proc. IEEE Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2017.</div>
+
+<div>[14] J. Redmon and A. Farhadi, "YOLOv3: An Incremental Improvement," <em>arXiv preprint</em> arXiv:1804.02767, 2018.</div>
+
+<div>[15] M. Everingham, L. Van Gool, C. K. I. Williams, J. Winn, and A. Zisserman, "The PASCAL Visual Object Classes (VOC) Challenge," <em>International Journal of Computer Vision</em>, vol. 88, no. 2, pp. 303&ndash;338, 2010.</div>
+
+<div>[16] T. Cheng, L. Song, Y. Ge, W. Liu, X. Wang, and Y. Shan, "YOLO-World: Real-Time Open-Vocabulary Object Detection," in <em>Proc. IEEE/CVF Conf. Computer Vision and Pattern Recognition (CVPR)</em>, 2024.</div>
+
+<div>[17] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark, G. Krueger, and I. Sutskever, "Learning Transferable Visual Models from Natural Language Supervision," in <em>Proc. Int. Conf. Machine Learning (ICML)</em>, 2021.</div>
+
+<div>[18] R. Ranftl, K. Lasinger, D. Hafner, K. Schindler, and V. Koltun, "Towards Robust Monocular Depth Estimation: Mixing Datasets for Zero-Shot Cross-Dataset Transfer," <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, vol. 44, no. 3, 2022.</div>
+
+<div>[19] G. Bradski, "The OpenCV Library," <em>Dr. Dobb's Journal of Software Tools</em>, 2000.</div>
+
+<div>[20] A. Paszke, S. Gross, F. Massa, A. Lerer, J. Bradbury, G. Chanan, T. Killeen, <em>et al.</em>, "PyTorch: An Imperative Style, High-Performance Deep Learning Library," in <em>Advances in Neural Information Processing Systems (NeurIPS)</em>, 2019.</div>
+</div>
+
+<!-- ==================== APPENDICES ==================== -->
+<h1 class="chapter"><span class="num">Appendices</span>&nbsp;</h1>
+
+<h2>Appendix A &mdash; Dataset Information</h2>
+<table>
+  <tr><th>Property</th><th>Value</th></tr>
+  <tr><td>Initial image pool</td><td class="num">21,359</td></tr>
+  <tr><td>Domain-selected (Dhaka footpath)</td><td class="num">3,000</td></tr>
+  <tr><td>After near-duplicate removal</td><td class="num">2,787</td></tr>
+  <tr><td>Annotated and exported</td><td class="num">2,782</td></tr>
+  <tr><td>Used for training (paired, non-empty)</td><td class="num">2,763</td></tr>
+  <tr><td>Total bounding boxes</td><td class="num">23,962</td></tr>
+  <tr><td>Source image resolution</td><td>256 &times; 256</td></tr>
+  <tr><td>Training resolution</td><td>640 &times; 640 (letterboxed)</td></tr>
+  <tr><td>Annotation format</td><td>YOLO (<code>class_id cx cy w h</code>, normalised)</td></tr>
+  <tr><td>De-duplication method</td><td>Difference hash, Hamming distance &le; 5</td></tr>
+  <tr><td>Split ratio / seed</td><td>70 / 20 / 10, seed 42, cluster-level</td></tr>
+</table>
+
+<h2>Appendix B &mdash; Class List</h2>
+<p>Thesis classes (trained on project data) &mdash; see Table 3.1 for full definitions:</p>
+<pre>
+0  person           মানুষ                 5  open_drain       খোলা ড্রেন
+1  pole             খুঁটি                  6  parked_vehicle   পার্ক করা গাড়ি
+2  tree             গাছ                   7  street_obstacle  রাস্তার প্রতিবন্ধকতা
+3  stairs           সিঁড়ি                  8  curb             ফুটপাতের কিনারা
+4  pothole          গর্ত
+</pre>
+<p>Indoor classes (COCO-pretrained, runtime only, no thesis-measured mAP):</p>
+<pre>
+chair (চেয়ার)      couch (সোফা)        bed (বিছানা)         dining table (টেবিল)
+tv (টেলিভিশন)      toilet (টয়লেট)      sink (সিংক)          refrigerator (ফ্রিজ)
+oven (ওভেন)        microwave (মাইক্রোওয়েভ)   potted plant (গাছের টব)   bench (বেঞ্চ)
+</pre>
+<p>
+<code>door</code> is not supported: it is absent from the COCO category list and was not
+annotated in the thesis dataset.
+</p>
+
+<h2>Appendix C &mdash; Important Configuration</h2>
+<pre>
+DETECTION
+  confidence            0.50   (adjustable 0.10 - 0.95 at runtime)
+  iou (NMS)             0.45   inference   /   0.60 evaluation
+  imgsz                 640
+  max_det               30
+  device                auto (CUDA if available, else CPU)
+  indoor_enabled        true
+  indoor_conf           0.40
+
+SPATIAL
+  zone_left_edge        0.33
+  zone_right_edge       0.66
+  near_area_ratio       0.15
+  medium_area_ratio     0.04
+
+NAVIGATION AND VOICE
+  language              bn  (default)
+  announce_cooldown     3.0 s   per (class, position)
+  global_min_gap        1.2 s   between any two utterances
+  max_spoken_objects    3       combined into ONE sentence
+  announce_far          false
+  tts_backend           auto -> edge-tts (bn) / pyttsx3 (en)
+  tts_voice_bn          bn-BD-NabanitaNeural
+
+STREAM
+  jpeg_quality          70
+  stream_fps_cap        20
+</pre>
+
+<h2>Appendix D &mdash; Algorithms</h2>
+<p>Pseudocode for the five core algorithms is given in Section 3.15 and is not repeated here.</p>
+
+<h2>Appendix E &mdash; Sample Detection Results</h2>
+<p>See Figures 5.6 and 5.7. Additional annotated outputs are stored in the project under
+<code>reports/figures/</code>.</p>
+
+<h2>Appendix F &mdash; User Interface Screenshots</h2>
+<figure class="wide">
+  <img src="figures/ui_image_mode.png" alt="Interface in image mode">
+  <p class="caption">Figure F.1 &mdash; Interface in image mode, showing the annotated result, the
+  generated Bengali instruction and the detection metadata.</p>
+</figure>
+<p>Figure 5.9 shows the interface in recorded-video mode.</p>
+
+<h2>Appendix G &mdash; Experimental Tables</h2>
+<p>
+Overall and per-class results are in Tables 5.3 and 5.4; training progression in Table 5.2;
+runtime performance in Table 5.7; annotation transfer in Table 5.1. Raw outputs are stored in the
+project at <code>runs/detect/runs/evaluate/exp/metrics.json</code> and
+<code>runs/detect/runs/train/thesis_v1/results.csv</code>.
+</p>
+
+<h2>Appendix H &mdash; Installation and Execution</h2>
+<pre>
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Install the CUDA build of PyTorch (the default wheel is CPU-only)
+pip install --upgrade --index-url https://download.pytorch.org/whl/cu128 torch torchvision
+python -c "import torch; print(torch.cuda.is_available())"     # must print True
+
+# 3. Run the application
+python app/main.py --port 8010                 # then open http://127.0.0.1:8010
+
+# Useful options
+python app/main.py --camera 1                  # different camera index
+python app/main.py --camera clip.mp4           # video file as source
+python app/main.py --language en               # start in English
+python -m backend.camera                       # list working camera sources
+
+# 4. Reproduce the dataset and model
+python scripts/build_annotation_set.py         # select and de-duplicate
+python scripts/autolabel.py                    # candidate annotations
+python scripts/review_labels.py                # human verification UI
+python scripts/prepare_dataset.py              # 70/20/10 splits
+python scripts/train.py                        # train -> best.pt
+python scripts/validate.py                     # P, R, mAP, confusion matrix
+</pre>
+
+<h2>Appendix I &mdash; Selected Source Code</h2>
+<p><strong>I.1 &mdash; Position and proximity classification</strong> (<code>backend/spatial.py</code>):</p>
+<pre>
+def get_position(self, center_x, frame_width):
+    frac = center_x / float(frame_width)
+    s = self.settings
+    if frac &lt; s.get("zone_left_edge"):
+        return LEFT
+    if frac &gt; s.get("zone_right_edge"):
+        return RIGHT
+    return CENTER
+
+def get_proximity(self, bbox, frame_width, frame_height):
+    x1, y1, x2, y2 = bbox
+    area_ratio = ((x2 - x1) * (y2 - y1)) / float(frame_width * frame_height)
+    if self.depth_provider is not None:        # extension point for real depth
+        metres = self.depth_provider.depth_at(...)
+        if metres is not None:
+            return (NEAR if metres &lt;= 1.5 else
+                    MEDIUM if metres &lt;= 4.0 else FAR), area_ratio
+    s = self.settings
+    if area_ratio &gt;= s.get("near_area_ratio"):
+        return NEAR, area_ratio
+    if area_ratio &gt;= s.get("medium_area_ratio"):
+        return MEDIUM, area_ratio
+    return FAR, area_ratio
+</pre>
+
+<p><strong>I.2 &mdash; Priority scoring</strong> (<code>backend/navigation/navigation_engine.py</code>):</p>
+<pre>
+def priority_score(self, det):
+    score = 0.0
+    if det["class_name"] in DANGER_CLASSES:
+        score += 100.0
+    elif det["class_name"] in INDOOR_OBSTACLES:
+        score += 40.0
+    if det.get("position") == "CENTER":
+        score += 50.0
+    score += {"NEAR": 30.0, "MEDIUM": 12.0, "FAR": 0.0}.get(
+        det.get("proximity", "FAR"), 0.0)
+    score += float(det.get("confidence", 0.0)) * 10.0
+    return score
+</pre>
+
+<p><strong>I.3 &mdash; Bengali sentence construction</strong> (<code>backend/voice/message_generator.py</code>):</p>
+<pre>
+def _generate_bn(object_name, position, proximity, urgent, overrides):
+    name    = bengali_name(object_name, overrides)
+    article = _bn_article(object_name, name)     # একজন for people, একটি otherwise
+    place   = _BN_POSITION.get(position, "সামনে")
+    prox    = _BN_PROXIMITY.get(proximity, "")
+
+    # Subject-Object-Verb: [place] [proximity] [article] [noun] আছে।
+    pieces = [place]
+    if prox:
+        pieces.append(prox)
+    pieces.append(article)
+    pieces.append(name)
+    sentence = " ".join(pieces) + " আছে।"
+    return "{} {}".format(_BN_WARN, sentence) if urgent else sentence
+</pre>
+
+<p><strong>I.4 &mdash; Dual-model fusion</strong> (<code>backend/detector.py</code>):</p>
+<pre>
+@staticmethod
+def _merge(primary, secondary, iou_thr=0.55):
+    """Keep only secondary boxes that do not overlap a thesis-model box.
+       The thesis model always wins, because it is trained on this data."""
+    return [d for d in secondary
+            if not any(iou(d, p) &gt; iou_thr for p in primary)]
+</pre>
+
+<footer class="note" style="margin-top:18pt;">
+  VisionAssist AI &mdash; Object Detection and Navigation Assistance for Visually Impaired Individuals.
+  Research prototype. This system provides experimental computer-vision assistance and must not be
+  relied upon as the sole navigation aid for real-world mobility.
+</footer>
+
+</body>
+</html>
